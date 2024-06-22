@@ -2,6 +2,10 @@
   "name": "x-elements",
   "version": "0.1.0",
   "description": "Generic web components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benignware-labs/x-elements.git"
+  },
   "main": "index.mjs",
   "type": "module",
   "scripts": {
