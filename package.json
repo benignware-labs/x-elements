@@ -1,0 +1,12 @@
+{
+  "name": "x-elements",
+  "version": "0.1.0",
+  "description": "Generic web components",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
