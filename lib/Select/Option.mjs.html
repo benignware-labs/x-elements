@@ -1,0 +1,238 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - Option.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: Option.mjs</h1>
+      <p>
+        lib/Select/Option.mjs
+      </p>
+      
+      <pre><code class="hljs">export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">XOption</span> <span class="hljs-title">extends</span> <span class="hljs-title">HTMLElement</span> {
+  #internals;
+
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">super</span>();
+    <span class="hljs-keyword">this</span>.#internals = <span class="hljs-keyword">this</span>.attachInternals();
+
+    <span class="hljs-keyword">this</span>.attachShadow({ mode: <span class="hljs-string">&#x27;open&#x27;</span>, delegatesFocus: <span class="hljs-literal">true</span> });
+    <span class="hljs-keyword">this</span>.shadowRoot.innerHTML = `
+      &lt;style&gt;
+        :host {
+          display: <span class="hljs-keyword">inline</span>-block;
+          <span class="hljs-comment">/* border: 2px solid transparent; */</span>
+          cursor: pointer;
+        }
+
+        :host(:state(--selected)) {
+          <span class="hljs-comment">/* border-color: blue; */</span>
+        }
+      &lt;/style&gt;
+      &lt;slot&gt;&lt;/slot&gt;
+    `;
+
+    <span class="hljs-keyword">this</span>.handleClick = <span class="hljs-keyword">this</span>.handleClick.bind(<span class="hljs-keyword">this</span>);
+  }
+
+  <span class="hljs-keyword">set</span> value(value) {
+    <span class="hljs-keyword">this</span>.setAttribute(<span class="hljs-string">&#x27;value&#x27;</span>, value);
+  }
+
+  <span class="hljs-keyword">get</span> value() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getAttribute(<span class="hljs-string">&#x27;value&#x27;</span>) || <span class="hljs-string">&#x27;&#x27;</span>;
+  }
+
+  getSelected() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.#internals.states.has(<span class="hljs-string">&#x27;--selected&#x27;</span>);
+  }
+
+  setSelected(flag) {
+    <span class="hljs-keyword">if</span> (flag !== <span class="hljs-keyword">this</span>.getAttribute(<span class="hljs-string">&#x27;selected&#x27;</span>)) {
+      <span class="hljs-keyword">if</span> (flag) {
+        <span class="hljs-keyword">this</span>.setAttribute(<span class="hljs-string">&#x27;selected&#x27;</span>, flag);
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">this</span>.removeAttribute(<span class="hljs-string">&#x27;selected&#x27;</span>);
+      }
+    }
+
+    <span class="hljs-keyword">if</span> (flag === <span class="hljs-keyword">this</span>.selected) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">if</span> (flag) {
+      <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--selected&#x27;</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--selected&#x27;</span>);
+    }
+
+    <span class="hljs-keyword">const</span> event = new Event(<span class="hljs-string">&quot;x-option:change&quot;</span>, {
+      bubbles: <span class="hljs-literal">true</span>,
+      composed: <span class="hljs-literal">true</span>,
+    });
+
+    window.requestAnimationFrame(() =&gt; {
+      <span class="hljs-comment">// Dispatch the event.</span>
+      <span class="hljs-keyword">this</span>.dispatchEvent(event);
+    });
+  }
+
+  <span class="hljs-keyword">set</span> selected(flag) {
+    <span class="hljs-keyword">this</span>.setSelected(flag);
+  }
+
+  <span class="hljs-keyword">get</span> selected() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getSelected();
+  }
+
+  connectedCallback() {
+    <span class="hljs-keyword">this</span>.selected = <span class="hljs-keyword">this</span>.hasAttribute(<span class="hljs-string">&#x27;selected&#x27;</span>);
+    <span class="hljs-keyword">this</span>.addEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">this</span>.handleClick);
+  }
+
+  handleClick() {
+    <span class="hljs-keyword">const</span> selected = !<span class="hljs-keyword">this</span>.selected;
+    <span class="hljs-keyword">const</span> isMultiple = !!<span class="hljs-keyword">this</span>.closest(<span class="hljs-string">&#x27;x-select[multiple]&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (!selected &amp;&amp; <span class="hljs-keyword">this</span>.selected &amp;&amp; !isMultiple) {
+      <span class="hljs-keyword">return</span>;
+    }
+  
+    <span class="hljs-keyword">this</span>.setSelected(selected);
+  }
+
+  static <span class="hljs-keyword">get</span> observedAttributes() {
+    <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;selected&#x27;</span>, <span class="hljs-string">&#x27;value&#x27;</span>];
+  }
+  
+  attributeChangedCallback(name, oldValue, newValue) {
+    <span class="hljs-keyword">if</span> (oldValue === newValue) <span class="hljs-keyword">return</span>;
+
+    <span class="hljs-keyword">this</span>[name] = newValue;
+  }
+}
+
+customElements.define(<span class="hljs-string">&#x27;x-option&#x27;</span>, XOption);</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

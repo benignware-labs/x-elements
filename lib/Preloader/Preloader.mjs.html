@@ -1,0 +1,340 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - Preloader.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: Preloader.mjs</h1>
+      <p>
+        lib/Preloader/Preloader.mjs
+      </p>
+      
+      <pre><code class="hljs"><span class="hljs-keyword">class</span> <span class="hljs-title class_">XPreloader</span> <span class="hljs-title">extends</span> <span class="hljs-title">HTMLElement</span> {
+  #internals;
+  #assignedNodes = [];
+  #mutationObserver;
+  #queue = [];
+  #body;
+
+  static LOADER_TAGS = [<span class="hljs-string">&#x27;img&#x27;</span>, <span class="hljs-string">&#x27;video&#x27;</span>, <span class="hljs-string">&#x27;audio&#x27;</span>, <span class="hljs-string">&#x27;iframe&#x27;</span>, <span class="hljs-string">&#x27;link&#x27;</span>];
+
+  static isLoaderNode(node) {
+    <span class="hljs-keyword">if</span> (node.nodeType !== <span class="hljs-number">1</span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+  
+    <span class="hljs-keyword">return</span> XPreloader.LOADER_TAGS.includes(node.tagName.toLowerCase()) || Reflect.has(node, <span class="hljs-string">&#x27;complete&#x27;</span>);
+  }
+
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">super</span>();
+
+    <span class="hljs-keyword">this</span>.handleMutation = <span class="hljs-keyword">this</span>.handleMutation.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleComplete = <span class="hljs-keyword">this</span>.handleComplete.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleSlotChange = <span class="hljs-keyword">this</span>.handleSlotChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleItemLoad = <span class="hljs-keyword">this</span>.handleItemLoad.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleItemLoadStart = <span class="hljs-keyword">this</span>.handleItemLoadStart.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleItemError = <span class="hljs-keyword">this</span>.handleItemError.bind(<span class="hljs-keyword">this</span>);
+
+    <span class="hljs-keyword">this</span>.attachShadow({ mode: <span class="hljs-string">&#x27;open&#x27;</span> });
+
+    <span class="hljs-keyword">this</span>.shadowRoot.innerHTML = `
+      &lt;style&gt;
+        <span class="hljs-comment">/* Add your styling here */</span>
+        :host {
+          display: block;
+          position: relative;
+        }
+
+        .body {
+          opacity: <span class="hljs-number">0</span>;
+          transition: opacity <span class="hljs-number">0.</span>3s;
+        }
+
+        :host(:state(--complete)) .body {
+          opacity: <span class="hljs-number">1</span>;
+        }
+        
+      &lt;/style&gt;
+      &lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">&quot;body&quot;</span>&gt;
+        &lt;!-- Add your preloader content here --&gt;
+        &lt;slot&gt;&lt;/slot&gt;
+      &lt;/div&gt;
+    `;
+  
+    <span class="hljs-keyword">this</span>.#internals = <span class="hljs-keyword">this</span>.attachInternals();
+    <span class="hljs-comment">// this.#internals.states.add(&#x27;--loading&#x27;);</span>
+
+    <span class="hljs-keyword">const</span> slot = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;slot&#x27;</span>);
+
+    slot.addEventListener(<span class="hljs-string">&#x27;slotchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleSlotChange);
+
+    <span class="hljs-keyword">this</span>.#mutationObserver = new MutationObserver(<span class="hljs-keyword">this</span>.handleMutation);
+
+    <span class="hljs-keyword">this</span>.#mutationObserver.observe(slot, {
+      childList: <span class="hljs-literal">true</span>,
+      subtree: <span class="hljs-literal">true</span>
+    });
+
+    <span class="hljs-keyword">this</span>.#body = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;.body&#x27;</span>);
+  }
+
+  handleMutation(mutations) {
+    mutations.forEach((mutation) =&gt; {
+      console.log(<span class="hljs-string">&#x27;Mutation&#x27;</span>, mutation);
+      mutation.addedNodes.forEach(node =&gt; <span class="hljs-keyword">this</span>.nodeAdded(node));
+      mutation.removedNodes.forEach(node =&gt; <span class="hljs-keyword">this</span>.nodeRemoved(node));
+
+      <span class="hljs-keyword">const</span> oldValue = mutation.oldValue;
+      <span class="hljs-keyword">const</span> newValue = mutation.target.getAttribute(mutation.attributeName);
+
+      <span class="hljs-keyword">if</span> (mutation.oldValue !== <span class="hljs-literal">null</span> &amp;&amp; oldValue !== newValue) {
+        console.log(<span class="hljs-string">&#x27;Attribute changed&#x27;</span>, mutation.attributeName, mutation.oldValue, newValue);
+        <span class="hljs-keyword">this</span>.#queue.push(mutation.target);
+        <span class="hljs-keyword">this</span>.update();
+        <span class="hljs-keyword">this</span>.handleItemLoadStart({ target: mutation.target });
+      }
+    });
+  }
+
+  nodeAdded(node) {
+    console.log(<span class="hljs-string">&#x27;Node added&#x27;</span>, node);
+    <span class="hljs-keyword">if</span> (XPreloader.isLoaderNode(node)) {
+      console.log(<span class="hljs-string">&#x27;FOUND LOADER NODE:&#x27;</span>, node);
+      node.addEventListener(<span class="hljs-string">&#x27;load&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemLoad);
+      node.addEventListener(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemError);
+
+      <span class="hljs-comment">// this.#mutationObserver.observe(node, {</span>
+      <span class="hljs-comment">//   attributes: true,</span>
+      <span class="hljs-comment">//   attributeFilter: [&#x27;src&#x27;, &#x27;srcset&#x27;, &#x27;poster&#x27;, &#x27;href&#x27;],</span>
+      <span class="hljs-comment">//   attributeOldValue: true</span>
+      <span class="hljs-comment">// });</span>
+
+      <span class="hljs-keyword">if</span> (!node.complete) {
+        console.log(<span class="hljs-string">&#x27;Node not complete&#x27;</span>, node);
+        node.style.visibility = <span class="hljs-string">&#x27;hidden&#x27;</span>;
+        <span class="hljs-keyword">this</span>.#queue.push(node);
+        <span class="hljs-keyword">this</span>.update();
+      }
+    }
+  }
+
+  nodeRemoved(node) {
+    console.log(<span class="hljs-string">&#x27;Node removed&#x27;</span>, node);
+    <span class="hljs-keyword">if</span> (XPreloader.isLoaderNode(node)) {
+      console.log(<span class="hljs-string">&#x27;FOUND LOADER NODE:&#x27;</span>, node);
+      node.removeEventListener(<span class="hljs-string">&#x27;load&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemLoad);
+      node.removeEventListener(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemError);
+
+      <span class="hljs-comment">// this.#mutationObserver.unobserve(node);</span>
+    }
+  }
+
+  handleSlotChange(e) {
+    console.log(<span class="hljs-string">&#x27;SLOT CHANGE&#x27;</span>, e.target.assignedNodes());
+    <span class="hljs-keyword">const</span> removedNodes = <span class="hljs-keyword">this</span>.#assignedNodes.filter(x =&gt; !e.target.assignedNodes().includes(x));
+    <span class="hljs-keyword">const</span> addedNodes = e.target.assignedNodes().filter(x =&gt; !<span class="hljs-keyword">this</span>.#assignedNodes.includes(x));
+
+    <span class="hljs-keyword">this</span>.#assignedNodes = addedNodes;
+
+    addedNodes
+      .filter(node =&gt; node.nodeType === <span class="hljs-number">1</span>)
+      .forEach(node =&gt; {
+        <span class="hljs-keyword">this</span>.#mutationObserver.observe(node, {
+          childList: <span class="hljs-literal">true</span>,
+          subtree: <span class="hljs-literal">true</span>,
+          attributes: <span class="hljs-literal">true</span>,
+          attributeFilter: [<span class="hljs-string">&#x27;src&#x27;</span>, <span class="hljs-string">&#x27;srcset&#x27;</span>, <span class="hljs-string">&#x27;poster&#x27;</span>, <span class="hljs-string">&#x27;href&#x27;</span>],
+          attributeOldValue: <span class="hljs-literal">true</span>
+        });
+      
+        <span class="hljs-keyword">const</span> descendants = node.querySelectorAll(<span class="hljs-string">&#x27;*&#x27;</span>);
+        descendants.forEach(descendant =&gt; <span class="hljs-keyword">this</span>.nodeAdded(descendant));
+
+        <span class="hljs-keyword">this</span>.nodeAdded(node);
+      });
+
+    removedNodes
+      .filter(node =&gt; node.nodeType === <span class="hljs-number">1</span>)
+      .forEach(node =&gt; {
+        <span class="hljs-keyword">this</span>.#mutationObserver.unobserve(node);
+      });
+  }
+
+  update() {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#queue.length === <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">this</span>.handleComplete();
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--loading&#x27;</span>);
+    }
+  }
+
+  handleItemLoadStart(e) {
+    <span class="hljs-comment">// console.log(&#x27;$$$$$$$ Item load start&#x27;, e);</span>
+  }
+
+  handleItemLoad(e) {
+    <span class="hljs-keyword">this</span>.#queue = <span class="hljs-keyword">this</span>.#queue.filter(x =&gt; x !== e.target);
+    console.log(<span class="hljs-string">&#x27;Item loaded&#x27;</span>, e.target, <span class="hljs-keyword">this</span>.#queue.length);
+    
+    e.target.style.visibility = <span class="hljs-string">&#x27;&#x27;</span>;
+
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handleItemError(e) {
+    console.log(<span class="hljs-string">&#x27;Item error&#x27;</span>, e);
+    <span class="hljs-keyword">this</span>.#queue = <span class="hljs-keyword">this</span>.#queue.filter(x =&gt; x !== e.target);
+    <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--loading&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--error&#x27;</span>);
+
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handleComplete() {
+    console.log(<span class="hljs-string">&#x27;******** Complete ********&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--loading&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--complete&#x27;</span>);
+
+    <span class="hljs-keyword">this</span>.#assignedNodes.forEach(node =&gt; {
+      <span class="hljs-keyword">if</span> (node.nodeType === <span class="hljs-number">1</span>) {
+        node.style.visibility = <span class="hljs-string">&#x27;&#x27;</span>;
+      }
+    });
+
+    <span class="hljs-keyword">const</span> loadEvent = new CustomEvent(<span class="hljs-string">&#x27;load&#x27;</span>);
+
+    <span class="hljs-keyword">this</span>.dispatchEvent(loadEvent);
+  }
+
+  connectedCallback() {
+    console.log(<span class="hljs-string">&#x27;Connected&#x27;</span>);
+  }
+}
+
+customElements.define(<span class="hljs-string">&#x27;x-preloader&#x27;</span>, XPreloader);
+
+export default XPreloader;</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

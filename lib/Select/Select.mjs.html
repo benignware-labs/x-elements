@@ -1,0 +1,243 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - Select.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: Select.mjs</h1>
+      <p>
+        lib/Select/Select.mjs
+      </p>
+      
+      <pre><code class="hljs"><span class="hljs-comment">/**
+ * <span class="hljs-doctag">@element</span> x-select
+ * <span class="hljs-doctag">@attr</span> {string} name
+ * <span class="hljs-doctag">@attr</span> {string} value
+ */</span>
+export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">XSelect</span> <span class="hljs-title">extends</span> <span class="hljs-title">HTMLElement</span> {
+  static formAssociated = <span class="hljs-literal">true</span>; <span class="hljs-comment">// this is needed</span>
+  #internals;
+
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">super</span>();
+    <span class="hljs-keyword">this</span>.#internals = <span class="hljs-keyword">this</span>.attachInternals();
+
+    <span class="hljs-keyword">this</span>.attachShadow({ mode: <span class="hljs-string">&#x27;open&#x27;</span>, delegatesFocus: <span class="hljs-literal">true</span> });
+    <span class="hljs-keyword">this</span>.shadowRoot.innerHTML = `
+      &lt;style&gt;
+        :host {
+         <span class="hljs-comment">/* display: inline-flex;
+          flex-direction: column;
+          gap: 0.5rem;*/</span>
+        }
+      &lt;/style&gt;
+      &lt;slot&gt;&lt;/slot&gt;
+    `;
+
+    <span class="hljs-keyword">this</span>.handleChange = <span class="hljs-keyword">this</span>.handleChange.bind(<span class="hljs-keyword">this</span>);
+  }
+
+  handleChange(event) {
+    <span class="hljs-keyword">const</span> items = <span class="hljs-keyword">this</span>.querySelectorAll(<span class="hljs-string">&#x27;x-option&#x27;</span>);
+    <span class="hljs-keyword">const</span> isMultiple = <span class="hljs-keyword">this</span>.hasAttribute(<span class="hljs-string">&#x27;multiple&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (isMultiple) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">if</span> (!event.target.selected) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> item of items) {
+      <span class="hljs-keyword">if</span> (item !== event.target) {
+        <span class="hljs-keyword">if</span> (item.selected) {
+          item.setAttribute(<span class="hljs-string">&#x27;selected&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>);
+        } <span class="hljs-keyword">else</span> {
+          item.removeAttribute(<span class="hljs-string">&#x27;selected&#x27;</span>);
+        }
+      }
+    }
+
+    <span class="hljs-keyword">this</span>.#internals.setFormValue(event.target.value);
+
+    <span class="hljs-keyword">const</span> change = new Event(<span class="hljs-string">&quot;change&quot;</span>, {
+      bubbles: <span class="hljs-literal">false</span>,
+      composed: <span class="hljs-literal">true</span>,
+    });
+
+    <span class="hljs-comment">// Dispatch the event.</span>
+    <span class="hljs-keyword">this</span>.dispatchEvent(change);
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#internals.form) {
+      <span class="hljs-keyword">this</span>.#internals.form.dispatchEvent(
+        new Event(<span class="hljs-string">&quot;change&quot;</span>, {
+          bubbles: <span class="hljs-literal">false</span>,
+          composed: <span class="hljs-literal">true</span>,
+        }),
+      );
+    }
+  }
+
+  <span class="hljs-keyword">get</span> value() {
+    <span class="hljs-keyword">const</span> items = <span class="hljs-keyword">this</span>.querySelectorAll(<span class="hljs-string">&#x27;x-option&#x27;</span>);
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> item of items) {
+      <span class="hljs-keyword">if</span> (item.selected) {
+        <span class="hljs-keyword">return</span> item.value;
+      }
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>;
+  }
+
+  <span class="hljs-keyword">get</span> selectedIndex() {
+    <span class="hljs-keyword">const</span> items = [...<span class="hljs-keyword">this</span>.querySelectorAll(<span class="hljs-string">&#x27;x-option&#x27;</span>)];
+
+    <span class="hljs-keyword">return</span> items.findIndex(item =&gt; item.selected);
+  }
+
+  connectedCallback() {
+    <span class="hljs-comment">// Listen for the event.</span>
+    <span class="hljs-keyword">this</span>.addEventListener(
+      <span class="hljs-string">&quot;x-option:change&quot;</span>,
+      <span class="hljs-keyword">this</span>.handleChange,
+      <span class="hljs-literal">false</span>,
+    );
+  }
+
+  static <span class="hljs-keyword">get</span> observedAttributes() {
+    <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-string">&#x27;value&#x27;</span>, <span class="hljs-string">&#x27;multiple&#x27;</span>];
+  }
+  
+  attributeChangedCallback(name, oldValue, newValue) {
+    <span class="hljs-keyword">if</span> (oldValue === newValue) <span class="hljs-keyword">return</span>;
+
+    <span class="hljs-keyword">this</span>[name] = newValue;
+  }
+}
+
+customElements.define(<span class="hljs-string">&#x27;x-select&#x27;</span>, XSelect);</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

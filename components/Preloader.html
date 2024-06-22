@@ -1,0 +1,330 @@
+<html>
+  <head>
+    <base href=".."/>
+    <title>x-elements - Preloader</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link active"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Preloader</h1>
+      <p>
+
+  <h3>Example Template</h3>
+  <template id="example-2-template">
+    
+
+    <style>img, test-element {
+  aspect-ratio: 16/9;
+  max-width: 300px;
+}
+
+.frame {
+  position: relative;
+}
+
+.preloader {
+  display: block;
+  position: relative;
+}
+
+.preloader ~ .spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+} 
+
+.preloader:state(--loading) ~ .spinner {
+  display: block;
+}
+</style><script>(() => {customElements.define('test-element', class TestElement extends HTMLElement {
+  #complete = false;
+
+  constructor() {
+    super();
+
+    this.handleLoad = this.handleLoad.bind(this);
+
+    this.attachShadow({mode: 'open'});
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+      <h1>Hello World</h1>
+      <img class="img-fluid" src="https://baconmockup.com/640/360"/>
+    `;
+
+    const preloader = this.shadowRoot.querySelector('img');
+
+    preloader.addEventListener('load', () => {
+      console.log('!!!! loAded');
+      this.handleLoad();
+    });
+  }
+
+  handleLoad() {
+    console.log('loaded');
+    this.#complete = true;
+
+    const loadEvent = new CustomEvent('load');
+
+    this.dispatchEvent(loadEvent); 
+  }
+
+  get complete() {
+    return this.#complete;
+  }
+
+  connectedCallback() {
+    console.log('connected');
+  }
+});
+})()</script>
+
+    <div class="example-body">
+      <div class="frame">
+  <x-preloader class="preloader">
+    <h2>Load content</h2>
+    <div class="d-flex">
+      <img
+        id="test"
+        src="https://loremflickr.com/1280/640?lock=1234"
+      />
+      <img
+        id="test"
+        src="https://loremflickr.com/1280/640?lock=4321"
+      />
+    </div>
+    <test-element></test-element>
+  </x-preloader>
+  <div class="spinner">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-2-viewer" template="#example-2-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-selector-tag">img</span>, test-element {
+  aspect-ratio: <span class="hljs-number">16</span>/<span class="hljs-number">9</span>;
+  <span class="hljs-attribute">max-width</span>: <span class="hljs-number">300px</span>;
+}
+
+<span class="hljs-selector-class">.frame</span> {
+  <span class="hljs-attribute">position</span>: relative;
+}
+
+<span class="hljs-selector-class">.preloader</span> {
+  <span class="hljs-attribute">display</span>: block;
+  <span class="hljs-attribute">position</span>: relative;
+}
+
+<span class="hljs-selector-class">.preloader</span> ~ <span class="hljs-selector-class">.spinner</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">top</span>: <span class="hljs-number">50%</span>;
+  <span class="hljs-attribute">left</span>: <span class="hljs-number">50%</span>;
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translate</span>(-<span class="hljs-number">50%</span>, -<span class="hljs-number">50%</span>);
+  <span class="hljs-attribute">display</span>: none;
+} 
+
+<span class="hljs-selector-class">.preloader</span>:<span class="hljs-built_in">state</span>(--loading) ~ .spinner {
+  <span class="hljs-attribute">display</span>: block;
+}
+</code></pre>
+<pre><code class="hljs">customElements.<span class="hljs-title function_">define</span>(<span class="hljs-string">&#x27;test-element&#x27;</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">TestElement</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">HTMLElement</span> {
+  #complete = <span class="hljs-literal">false</span>;
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">super</span>();
+
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">handleLoad</span> = <span class="hljs-variable language_">this</span>.<span class="hljs-property">handleLoad</span>.<span class="hljs-title function_">bind</span>(<span class="hljs-variable language_">this</span>);
+
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">attachShadow</span>({<span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;open&#x27;</span>});
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">shadowRoot</span>.<span class="hljs-property">innerHTML</span> = <span class="hljs-string">`
+      &lt;style&gt;
+        :host {
+          display: block;
+        }
+      &lt;/style&gt;
+      &lt;h1&gt;Hello World&lt;/h1&gt;
+      &lt;img class=&quot;img-fluid&quot; src=&quot;https://baconmockup.com/640/360&quot;/&gt;
+    `</span>;
+
+    <span class="hljs-keyword">const</span> preloader = <span class="hljs-variable language_">this</span>.<span class="hljs-property">shadowRoot</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;img&#x27;</span>);
+
+    preloader.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;load&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;!!!! loAded&#x27;</span>);
+      <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">handleLoad</span>();
+    });
+  }
+
+  <span class="hljs-title function_">handleLoad</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;loaded&#x27;</span>);
+    <span class="hljs-variable language_">this</span>.#complete = <span class="hljs-literal">true</span>;
+
+    <span class="hljs-keyword">const</span> loadEvent = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CustomEvent</span>(<span class="hljs-string">&#x27;load&#x27;</span>);
+
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">dispatchEvent</span>(loadEvent); 
+  }
+
+  <span class="hljs-keyword">get</span> <span class="hljs-title function_">complete</span>() {
+    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.#complete;
+  }
+
+  <span class="hljs-title function_">connectedCallback</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;connected&#x27;</span>);
+  }
+});
+</code></pre>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;frame&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-preloader</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;preloader&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Load content<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;d-flex&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+        <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;test&quot;</span>
+        <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://loremflickr.com/1280/640?lock=1234&quot;</span>
+      /&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+        <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;test&quot;</span>
+        <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://loremflickr.com/1280/640?lock=4321&quot;</span>
+      /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">test-element</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">test-element</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-preloader</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;spinner&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;spinner-border text-primary&quot;</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;status&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Loading...<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</code></pre>
+
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

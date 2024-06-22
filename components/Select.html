@@ -1,0 +1,220 @@
+<html>
+  <head>
+    <base href=".."/>
+    <title>x-elements - Select</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link active"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link active"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link active"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Select</h1>
+      <p>
+
+  <h3>Example Template</h3>
+  <template id="example-1-template">
+    
+
+    <style>x-option {
+  border: 1px solid #d3d3d3;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;  
+}
+
+x-option:state(--selected) {
+  background-color: white;
+  color: black;
+}
+</style><script>(() => {document
+  .querySelector('#selectExampleForm')
+  .addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    alert(formData.get('test')); 
+  });
+})()</script>
+
+    <div class="example-body">
+      <form id="selectExampleForm">
+  <x-select name="test">
+    <x-option value="item-1">
+      Item 1
+    </x-option>
+
+    <x-option value="item-2">
+      Item 2
+    </x-option>
+
+    <x-option value="item-3">
+      Item 3
+    </x-option>
+  </x-select>
+  <button type="submit">Submit</button>
+</form>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-1-viewer" template="#example-1-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs">x-option {
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#d3d3d3</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span>;
+  <span class="hljs-attribute">margin</span>: <span class="hljs-number">10px</span>;
+  <span class="hljs-attribute">display</span>: inline-block;  
+}
+
+x-option:<span class="hljs-built_in">state</span>(--selected) {
+  <span class="hljs-attribute">background-color</span>: white;
+  <span class="hljs-attribute">color</span>: black;
+}
+</code></pre>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;selectExampleForm&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-select</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;test&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">x-option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;item-1&quot;</span>&gt;</span>
+      Item 1
+    <span class="hljs-tag">&lt;/<span class="hljs-name">x-option</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">x-option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;item-2&quot;</span>&gt;</span>
+      Item 2
+    <span class="hljs-tag">&lt;/<span class="hljs-name">x-option</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">x-option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;item-3&quot;</span>&gt;</span>
+      Item 3
+    <span class="hljs-tag">&lt;/<span class="hljs-name">x-option</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-select</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;submit&quot;</span>&gt;</span>Submit<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-variable language_">document</span>
+  .<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#selectExampleForm&#x27;</span>)
+  .<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;submit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+    e.<span class="hljs-title function_">preventDefault</span>();
+    <span class="hljs-keyword">const</span> formData = <span class="hljs-keyword">new</span> <span class="hljs-title class_">FormData</span>(e.<span class="hljs-property">target</span>);
+
+    <span class="hljs-title function_">alert</span>(formData.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;test&#x27;</span>)); 
+  });
+</code></pre>
+
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>
