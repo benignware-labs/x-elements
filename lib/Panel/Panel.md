@@ -26,7 +26,7 @@
 
 ```html
 <div class="wrapper">
-  <x-panel id="panel" orientation="right top left bottom">
+  <x-panel id="panel" orientation="left center">
     <div class="panel">
       <h1>Panel</h1>
       <p>This is a panel</p>
