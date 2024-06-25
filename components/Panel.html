@@ -1,0 +1,421 @@
+<html>
+  <head>
+    <base href=".."/>
+    <title>x-elements - Panel</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link active"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Panel</h1>
+      <h2>Basic Example</h2>
+<p>
+
+  <template id="example-3-template">
+    
+
+    <style>.panel {
+  background-color: #f1f1f1;
+  color: black;
+  border: 1px solid #d3d3d3;
+  padding: 10px;
+  min-width: 200px;
+  height: 100%;
+  margin: 20px;
+}
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+}
+</style><script>(() => {const panel = document.querySelector('#panel');
+
+panel.addEventListener('x-panel:shown', (e) => console.log('SHOWN', e.target.state));
+panel.addEventListener('x-panel:hidden', (e) => console.log('HIDDEN', e.target.state));
+})()</script>
+
+    <div class="example-body">
+      <div class="wrapper">
+  <x-panel id="panel" orientation="left center">
+    <div class="panel">
+      <h1>Panel</h1>
+      <p>This is a panel</p>
+    </div>
+  </x-panel>
+  <button style="position: relative" onclick="panel = document.querySelector('#panel'); panel.hidden = !panel.hidden;">
+    Toggle Panel
+  </button>
+</div>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-3-viewer" template="#example-3-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-selector-class">.panel</span> {
+  <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f1f1f1</span>;
+  <span class="hljs-attribute">color</span>: black;
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#d3d3d3</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span>;
+  <span class="hljs-attribute">min-width</span>: <span class="hljs-number">200px</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span>;
+}
+
+<span class="hljs-selector-class">.wrapper</span> {
+  <span class="hljs-attribute">position</span>: relative;
+  <span class="hljs-attribute">overflow</span>: hidden;
+  aspect-ratio: <span class="hljs-number">4</span>/<span class="hljs-number">3</span>;
+}
+</code></pre>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;wrapper&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-panel</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;panel&quot;</span> <span class="hljs-attr">orientation</span>=<span class="hljs-string">&quot;left center&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;panel&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Panel<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is a panel<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-panel</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;position: relative&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;panel = document.querySelector(&#x27;#panel&#x27;); panel.hidden = !panel.hidden;&quot;</span>&gt;</span>
+    Toggle Panel
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> panel = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#panel&#x27;</span>);
+
+panel.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;x-panel:shown&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;SHOWN&#x27;</span>, e.<span class="hljs-property">target</span>.<span class="hljs-property">state</span>));
+panel.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;x-panel:hidden&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;HIDDEN&#x27;</span>, e.<span class="hljs-property">target</span>.<span class="hljs-property">state</span>));
+</code></pre>
+<h2>Example: PanelManager</h2>
+<p>PanelManager lets you manage appearance of Panel groups</p>
+<p>
+
+  <template id="example-4-template">
+    
+
+    <style>.panel {
+  background-color: #f1f1f1;
+  color: black;
+  border: 1px solid #d3d3d3;
+  padding: 10px;
+  width: 150px;
+  aspect-ratio: 3/4;
+  margin: 20px;
+  font-size: 16px;
+}
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+}
+</style>
+      <script type="module">import { PanelManager } from 'x-elements';
+
+const manager = new PanelManager();
+
+manager.add(...document.querySelectorAll('x-panel[group]'));
+
+const buttons = document.querySelector('#buttons');
+
+buttons.addEventListener('click', (e) => {
+  const button = e.target.closest('[data-group]');
+
+  if (button) {
+    manager.set(button.dataset.group);
+  }
+});
+</script>
+
+    <div class="example-body">
+      <div id="wrapper" class="wrapper">
+  <x-panel group="scene1" orientation="center left" animation="slide">
+    <div class="panel">
+      <h4>Scene 1</h4>
+      <p>Left Panel</p>
+      <button style="position: relative" onclick="this.closest('x-panel').hidden = true;">
+        Close
+      </button>
+    </div>
+  </x-panel>
+  <x-panel group="scene1" orientation="center" animation="fade">
+    <div class="panel">
+      <h4>Scene 1</h4>
+      <p>Centered Panel</p>
+      <button style="position: relative" onclick="this.closest('x-panel').hidden = true;">
+        Close Panel
+      </button>
+    </div>
+  </x-panel>
+  <x-panel group="scene2" orientation="center left" hidden>
+    <div class="panel">
+      <h4>Scene 2</h4>
+      <p>This is Panel 2</p>
+    </div>
+  </x-panel>
+  <x-panel group="scene2" orientation="center" animation="slide" hidden>
+    <div class="panel">
+      <h4>Scene 2</h4>
+      <p>Centered Panel</p>
+      <button style="position: relative" onclick="this.closest('x-panel').hidden = true;">
+        Close Panel
+      </button>
+    </div>
+  </x-panel>
+  <x-panel group="scene3" orientation="center left" hidden>
+    <div class="panel">
+      <h4>Scene 3</h4>
+      <p>This is Panel 3</p>
+    </div>
+  </x-panel>
+  <div id="buttons">
+    <button data-group="scene1">
+      Scene 1
+    </button>
+    <button data-group="scene2">
+      Scene 2
+    </button>
+    <button data-group="scene3">
+      Scene 3
+    </button>
+  </div>
+</div>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-4-viewer" template="#example-4-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-selector-class">.panel</span> {
+  <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f1f1f1</span>;
+  <span class="hljs-attribute">color</span>: black;
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#d3d3d3</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span>;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">150px</span>;
+  aspect-ratio: <span class="hljs-number">3</span>/<span class="hljs-number">4</span>;
+  <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span>;
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">16px</span>;
+}
+
+<span class="hljs-selector-class">.wrapper</span> {
+  <span class="hljs-attribute">position</span>: relative;
+  <span class="hljs-attribute">overflow</span>: hidden;
+  aspect-ratio: <span class="hljs-number">4</span>/<span class="hljs-number">3</span>;
+}
+</code></pre>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;wrapper&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;wrapper&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-panel</span> <span class="hljs-attr">group</span>=<span class="hljs-string">&quot;scene1&quot;</span> <span class="hljs-attr">orientation</span>=<span class="hljs-string">&quot;center left&quot;</span> <span class="hljs-attr">animation</span>=<span class="hljs-string">&quot;slide&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;panel&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Scene 1<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Left Panel<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;position: relative&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.closest(&#x27;x-panel&#x27;).hidden = true;&quot;</span>&gt;</span>
+        Close
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-panel</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-panel</span> <span class="hljs-attr">group</span>=<span class="hljs-string">&quot;scene1&quot;</span> <span class="hljs-attr">orientation</span>=<span class="hljs-string">&quot;center&quot;</span> <span class="hljs-attr">animation</span>=<span class="hljs-string">&quot;fade&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;panel&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Scene 1<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Centered Panel<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;position: relative&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.closest(&#x27;x-panel&#x27;).hidden = true;&quot;</span>&gt;</span>
+        Close Panel
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-panel</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-panel</span> <span class="hljs-attr">group</span>=<span class="hljs-string">&quot;scene2&quot;</span> <span class="hljs-attr">orientation</span>=<span class="hljs-string">&quot;center left&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;panel&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Scene 2<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is Panel 2<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-panel</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-panel</span> <span class="hljs-attr">group</span>=<span class="hljs-string">&quot;scene2&quot;</span> <span class="hljs-attr">orientation</span>=<span class="hljs-string">&quot;center&quot;</span> <span class="hljs-attr">animation</span>=<span class="hljs-string">&quot;slide&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;panel&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Scene 2<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Centered Panel<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;position: relative&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.closest(&#x27;x-panel&#x27;).hidden = true;&quot;</span>&gt;</span>
+        Close Panel
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-panel</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-panel</span> <span class="hljs-attr">group</span>=<span class="hljs-string">&quot;scene3&quot;</span> <span class="hljs-attr">orientation</span>=<span class="hljs-string">&quot;center left&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;panel&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Scene 3<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is Panel 3<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-panel</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;buttons&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">data-group</span>=<span class="hljs-string">&quot;scene1&quot;</span>&gt;</span>
+      Scene 1
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">data-group</span>=<span class="hljs-string">&quot;scene2&quot;</span>&gt;</span>
+      Scene 2
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">data-group</span>=<span class="hljs-string">&quot;scene3&quot;</span>&gt;</span>
+      Scene 3
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">PanelManager</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;x-elements&#x27;</span>;
+
+<span class="hljs-keyword">const</span> manager = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PanelManager</span>();
+
+manager.<span class="hljs-title function_">add</span>(...<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;x-panel[group]&#x27;</span>));
+
+<span class="hljs-keyword">const</span> buttons = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#buttons&#x27;</span>);
+
+buttons.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> button = e.<span class="hljs-property">target</span>.<span class="hljs-title function_">closest</span>(<span class="hljs-string">&#x27;[data-group]&#x27;</span>);
+
+  <span class="hljs-keyword">if</span> (button) {
+    manager.<span class="hljs-title function_">set</span>(button.<span class="hljs-property">dataset</span>.<span class="hljs-property">group</span>);
+  }
+});
+</code></pre>
+
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

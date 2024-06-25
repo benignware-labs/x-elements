@@ -1,0 +1,449 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - Panel.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: Panel.mjs</h1>
+      <p>
+        lib/Panel/Panel.mjs
+      </p>
+      
+      <pre><code class="hljs">
+
+class Panel extends HTMLElement {
+  #internals;
+
+  constructor() {
+    super();
+    this.handleTransitionEnd = this.handleTransitionEnd.bind(this);
+
+    this.#internals = this.attachInternals();
+
+    this.shadow = this.attachShadow({mode: &#x27;open&#x27;});
+    this.layer = document.createElement(&#x27;div&#x27;);
+    this.layer.classList.add(&#x27;layer&#x27;);
+    this.shadow.appendChild(this.layer);
+    
+    this.panel = document.createElement(&#x27;div&#x27;);
+    this.panel.classList.add(&#x27;panel&#x27;);
+    this.layer.appendChild(this.panel);
+
+    const host = this.shadowRoot.host;
+
+    this.#internals.states.add(&#x27;--shown&#x27;);
+
+    console.log(&#x27;ADD TRANSITION HANDLER&#x27;, this.dataset);
+    host.addEventListener(&#x27;transitionend&#x27;, this.handleTransitionEnd);
+  }
+
+  handleTransitionEnd(event) {
+    console.log(&#x27;TRANSITION END&#x27;, event.target, event.propertyName, event.elapsedTime);
+    const target = event.target
+    const style = window.getComputedStyle(target);
+    
+
+    let fullyShown = false;
+    let fullyHidden = false;
+
+    if (event.propertyName === &#x27;transform&#x27;) {
+      const matrix = new DOMMatrixReadOnly(style.transform);
+      const x = matrix.e;
+      const y = matrix.f;
+      const sx = matrix.a;
+      const sy = matrix.d;
+      
+      const orientations = this.orientation.split(&#x27; &#x27;);
+
+      const width = target.offsetWidth;
+      const height = target.offsetHeight;
+
+      if (orientations.includes(&#x27;top&#x27;)) {
+        fullyShown = y === 0;
+        fullyHidden = y === -height;
+      } else if (orientations.includes(&#x27;bottom&#x27;)) {
+        fullyShown = y === 0;
+        fullyHidden = y === height;
+      } else if (orientations.includes(&#x27;left&#x27;)) {
+        fullyShown = x === 0;
+        fullyHidden = x === -width;
+      } else if (orientations.includes(&#x27;right&#x27;)) {
+        fullyShown = x === 0;
+        fullyHidden = x === width;
+      } else if (orientations.includes(&#x27;center&#x27;)) {
+        fullyShown = sx === 1 &amp;&amp; sy === 1;
+        fullyHidden = sx === 0 &amp;&amp; sy === 0;
+      }
+    }
+
+    if (event.propertyName === &#x27;opacity&#x27;) {
+      fullyShown = style.opacity === &#x27;1&#x27;;
+      fullyHidden = style.opacity === &#x27;0&#x27;;
+    }
+
+    if (fullyShown) {
+      this.#internals.states.add(&#x27;--shown&#x27;);
+      this.#internals.states.delete(&#x27;--showing&#x27;);
+    }
+
+    if (fullyHidden) {
+      this.#internals.states.add(&#x27;--hidden&#x27;);
+      this.#internals.states.delete(&#x27;--hiding&#x27;);
+    }
+
+    if (fullyShown) {
+      console.log(&#x27;shown&#x27;);
+      this.dispatchEvent(new CustomEvent(&#x27;x-panel:shown&#x27;));
+    }
+
+    if (fullyHidden) {
+      console.log(&#x27;hidden&#x27;);
+      this.dispatchEvent(new CustomEvent(&#x27;x-panel:hidden&#x27;));
+    }
+  }
+
+  connectedCallback() {
+    console.log(&#x27;*** CONNECTED CALLBACK&#x27;, this.dataset.scene, [...this.#internals.states.values()]);
+    this.render();
+
+    window.requestAnimationFrame(() =&gt; {
+      this.#internals.states.add(&#x27;--initialized&#x27;);
+    });
+  }
+
+  render() {
+    console.log(&#x27;RENDER&#x27;);
+    
+    this.shadowRoot.innerHTML = `
+      <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span>) {
+          <span class="hljs-attribute">display</span>: block <span class="hljs-meta">!important</span>;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span> {
+          <span class="hljs-attribute">position</span>: absolute;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(:<span class="hljs-built_in">state</span>(--initialized)) {
+          <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.33s</span> ease-in-out;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>)) {
+          <span class="hljs-attribute">top</span>: <span class="hljs-number">0</span>;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>)) {
+          <span class="hljs-attribute">left</span>: <span class="hljs-number">0</span>;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>),
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">left</span>: <span class="hljs-number">50%</span>;
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(-<span class="hljs-number">50%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>),
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">top</span>: <span class="hljs-number">50%</span>;
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">50%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span>) {
+          <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span>) {
+          <span class="hljs-attribute">bottom</span>: <span class="hljs-number">0</span>;
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[orientation=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">left</span>: <span class="hljs-number">50%</span>;
+          <span class="hljs-attribute">top</span>: <span class="hljs-number">50%</span>;
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translate</span>(-<span class="hljs-number">50%</span>, -<span class="hljs-number">50%</span>) <span class="hljs-built_in">scale</span>(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>);
+        }
+
+        <span class="hljs-comment">/* HIDDEN */</span>
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>)<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span>)) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(-<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>)<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span>)) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(-<span class="hljs-number">50%</span>) <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span>)) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(-<span class="hljs-number">50%</span>) <span class="hljs-built_in">translateY</span>(<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span>)) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">50%</span>) <span class="hljs-built_in">translateX</span>(-<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span>)) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(-<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;center&quot;</span>]</span>) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">50%</span>) <span class="hljs-built_in">translateX</span>(<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span>)) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateX</span>(<span class="hljs-number">100%</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-attr">[orientation=<span class="hljs-string">&quot;center&quot;</span>]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translate</span>(-<span class="hljs-number">50%</span>, -<span class="hljs-number">50%</span>) <span class="hljs-built_in">scale</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span>) {
+          <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">scale</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+        }
+
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-attr">[animation*=<span class="hljs-string">&#x27;fade&#x27;</span>]</span>) {
+          <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0</span>;
+        }
+      </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">slot</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+    `;
+    
+  }
+
+  set hidden(val) {
+    if (val) {
+      this.setAttribute(&#x27;hidden&#x27;, &#x27;&#x27;);
+    } else {
+      this.removeAttribute(&#x27;hidden&#x27;);
+    }
+  }
+
+  get hidden() {
+    return this.hasAttribute(&#x27;hidden&#x27;);
+  }
+  
+  set orientation(val) {
+    if (val !== this.getAttribute(&#x27;orientation&#x27;)) {
+      if (val) {
+        this.setAttribute(&#x27;orientation&#x27;, val);
+      } else {
+        this.removeAttribute(&#x27;orientation&#x27;);
+      }
+    }
+  }
+
+  get orientation() {
+    return this.getAttribute(&#x27;orientation&#x27;) || &#x27;top left&#x27;;
+  }
+
+  get state () {
+    const states = [...this.#internals.states.values()]
+      .filter(state =&gt; state !== &#x27;--initialized&#x27;)
+      .map(state =&gt; state.replace(&#x27;--&#x27;, &#x27;&#x27;));
+
+    return states.pop();
+  }
+  
+  static get observedAttributes() {
+    return [&#x27;hidden&#x27;, &#x27;orientation&#x27;];
+  }
+  
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+
+    if (name === &#x27;hidden&#x27;) {
+      
+      const hidden = this.hasAttribute(&#x27;hidden&#x27;);
+
+      if (hidden) {
+        console.log(&#x27;HIDE&#x27;, this.dataset.scene, this.isConnected,  this.parentNode);
+      } else {
+        console.log(&#x27;SHOW&#x27;, this.dataset.scene, this.isConnected, this.parentNode);
+      }
+
+      if (hidden) {
+        if (this.#internals.states.has(&#x27;--initialized&#x27;)) {
+          this.#internals.states.delete(&#x27;--shown&#x27;);
+          this.#internals.states.delete(&#x27;--showing&#x27;);
+          this.#internals.states.add(&#x27;--hiding&#x27;);
+        } else {
+          this.#internals.states.add(&#x27;--hidden&#x27;);
+        }
+      } else {
+        if (this.#internals.states.has(&#x27;--initialized&#x27;)) {
+          this.#internals.states.delete(&#x27;--hidden&#x27;);
+          this.#internals.states.delete(&#x27;--hiding&#x27;);
+          this.#internals.states.add(&#x27;--showing&#x27;);
+        } else {
+          this.#internals.states.add(&#x27;--shown&#x27;);
+        }
+      }
+
+      return;
+    }
+
+    this[name] = newValue;
+  }
+}
+
+customElements.define(&#x27;x-panel&#x27;, Panel);
+
+export default Panel;</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

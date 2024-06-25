@@ -8,7 +8,16 @@
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
 
-    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
   </head>
   <body class="markdown-body flex-column">
     <div class="header flex">
@@ -107,6 +116,21 @@
     </li>
     
   
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
 </ul>
       
     </li>
@@ -124,7 +148,8 @@
       <pre><code class="hljs"><span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Preloader } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Preloader/Preloader.mjs&#x27;</span>;
 <span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Select } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Select/Select.mjs&#x27;</span>;
 <span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Option } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Select/Option.mjs&#x27;</span>;
-</code></pre>
+<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Panel } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Panel/Panel.mjs&#x27;</span>;
+<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> PanelManager } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Panel/PanelManager.mjs&#x27;</span>;</code></pre>
     </div>
   </div>
 </main>

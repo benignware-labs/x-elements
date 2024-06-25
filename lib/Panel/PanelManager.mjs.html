@@ -1,0 +1,250 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - PanelManager.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: PanelManager.mjs</h1>
+      <p>
+        lib/Panel/PanelManager.mjs
+      </p>
+      
+      <pre><code class="hljs"><span class="hljs-comment">// (panel) =&gt; panel.getAttribute(&#x27;group&#x27;) || panel.dataset.group,</span>
+
+export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">PanelManager</span> {
+  #options;
+  #panels;
+  #next = <span class="hljs-literal">null</span>;
+  #current = <span class="hljs-literal">null</span>;
+
+  <span class="hljs-keyword">constructor</span>(options = {}) {
+    <span class="hljs-keyword">this</span>._handleState = <span class="hljs-keyword">this</span>._handleState.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.#options = {
+      groupBy: (panel) =&gt; panel.getAttribute(<span class="hljs-string">&#x27;group&#x27;</span>) || panel.dataset.group,
+      ...options
+    };
+    <span class="hljs-keyword">this</span>.#panels = new Set();
+  }
+
+  <span class="hljs-keyword">get</span> options() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.#options;
+  }
+
+  <span class="hljs-keyword">get</span> panels() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.#panels;
+  }
+
+  add(...panel) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> p of panel) {
+      <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#current) {
+        <span class="hljs-keyword">this</span>.#current = p;
+      }
+      p.addEventListener(<span class="hljs-string">&#x27;x-panel:shown&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
+      p.addEventListener(<span class="hljs-string">&#x27;x-panel:hidden&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
+      <span class="hljs-keyword">this</span>.#panels.add(p);
+    }
+  }
+
+  remove(panel) {
+    p.removeEventListener(<span class="hljs-string">&#x27;x-panel:shown&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
+    p.removeEventListener(<span class="hljs-string">&#x27;x-panel:hidden&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
+    <span class="hljs-keyword">this</span>.#panels.delete(panel);
+  }
+
+  clear() {
+    <span class="hljs-keyword">this</span>.#panels.clear();
+  }
+
+  <span class="hljs-keyword">set</span>(group) {
+    console.log(<span class="hljs-string">&#x27;set&#x27;</span>, group);
+    <span class="hljs-keyword">this</span>.#next = group;
+
+    <span class="hljs-keyword">this</span>._handleState();
+  }
+
+  <span class="hljs-keyword">get</span>() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.#next !== <span class="hljs-literal">null</span> ? <span class="hljs-keyword">this</span>.#next : <span class="hljs-keyword">this</span>.#current;
+  }
+  
+  _handleState() {
+    console.log(<span class="hljs-string">&#x27;HANDLE STATE&#x27;</span>, <span class="hljs-keyword">this</span>.#next);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#next === <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> panels = Array.from(<span class="hljs-keyword">this</span>.#panels);
+
+    <span class="hljs-keyword">const</span> groupBy = typeof <span class="hljs-keyword">this</span>.#options.groupBy === <span class="hljs-string">&#x27;string&#x27;</span> ? (panel) =&gt; panel.getAttribute(<span class="hljs-keyword">this</span>.#options.groupBy) : <span class="hljs-keyword">this</span>.#options.groupBy;
+
+    <span class="hljs-keyword">const</span> others = panels.filter(panel =&gt; groupBy(panel) !== <span class="hljs-keyword">this</span>.#next);
+
+    console.log(<span class="hljs-string">&#x27;others: &#x27;</span>, <span class="hljs-keyword">this</span>.#next, others.length);
+    
+    others.forEach(panel =&gt; panel.hidden = <span class="hljs-literal">true</span>);
+
+    <span class="hljs-keyword">const</span> othersHidden = others.every(panel =&gt; panel.state === <span class="hljs-string">&#x27;hidden&#x27;</span>);
+
+    console.log(<span class="hljs-string">&#x27;states&#x27;</span>, others.map(panel =&gt; panel.state), othersHidden);
+
+    <span class="hljs-keyword">if</span> (othersHidden &amp;&amp; <span class="hljs-keyword">this</span>.#current !== <span class="hljs-keyword">this</span>.#next) {
+      console.log(<span class="hljs-string">&#x27;SHOW IT&#x27;</span>, <span class="hljs-keyword">this</span>.#next);
+
+      console.log(panels
+        .map(panel =&gt; groupBy(panel)));
+      
+      panels
+        .filter(panel =&gt; groupBy(panel) === <span class="hljs-keyword">this</span>.#next)
+        .forEach(panel =&gt; panel.hidden = <span class="hljs-literal">false</span>)
+      
+      <span class="hljs-keyword">this</span>.#current = <span class="hljs-keyword">this</span>.#next;
+      <span class="hljs-keyword">this</span>.#next = <span class="hljs-literal">null</span>;
+    }
+  }
+}</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

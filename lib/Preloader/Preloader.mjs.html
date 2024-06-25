@@ -8,7 +8,16 @@
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
 
-    <script src="public/plugins/core/example/ExampleViewer.js"></script><script src="-/index.mjs" type="module"></script>
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
   </head>
   <body class="markdown-body flex-column">
     <div class="header flex">
@@ -107,6 +116,21 @@
     </li>
     
   
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
 </ul>
       
     </li>
@@ -128,7 +152,7 @@
   #queue = [];
   #body;
 
-  static LOADER_TAGS = [<span class="hljs-string">&#x27;img&#x27;</span>, <span class="hljs-string">&#x27;video&#x27;</span>, <span class="hljs-string">&#x27;audio&#x27;</span>, <span class="hljs-string">&#x27;iframe&#x27;</span>, <span class="hljs-string">&#x27;link&#x27;</span>];
+  static LOADER_TAGS = [<span class="hljs-string">&#x27;img&#x27;</span>, <span class="hljs-string">&#x27;video&#x27;</span>, <span class="hljs-string">&#x27;audio&#x27;</span>, <span class="hljs-string">&#x27;iframe&#x27;</span>, <span class="hljs-string">&#x27;link&#x27;</span>, <span class="hljs-string">&#x27;script&#x27;</span>];
 
   static isLoaderNode(node) {
     <span class="hljs-keyword">if</span> (node.nodeType !== <span class="hljs-number">1</span>) {
@@ -161,6 +185,8 @@
         .body {
           opacity: <span class="hljs-number">0</span>;
           transition: opacity <span class="hljs-number">0.</span>3s;
+          width: <span class="hljs-number">100</span>%;
+          height: <span class="hljs-number">100</span>%;
         }
 
         :host(:state(--complete)) .body {
@@ -193,7 +219,6 @@
 
   handleMutation(mutations) {
     mutations.forEach((mutation) =&gt; {
-      console.log(<span class="hljs-string">&#x27;Mutation&#x27;</span>, mutation);
       mutation.addedNodes.forEach(node =&gt; <span class="hljs-keyword">this</span>.nodeAdded(node));
       mutation.removedNodes.forEach(node =&gt; <span class="hljs-keyword">this</span>.nodeRemoved(node));
 
@@ -201,7 +226,6 @@
       <span class="hljs-keyword">const</span> newValue = mutation.target.getAttribute(mutation.attributeName);
 
       <span class="hljs-keyword">if</span> (mutation.oldValue !== <span class="hljs-literal">null</span> &amp;&amp; oldValue !== newValue) {
-        console.log(<span class="hljs-string">&#x27;Attribute changed&#x27;</span>, mutation.attributeName, mutation.oldValue, newValue);
         <span class="hljs-keyword">this</span>.#queue.push(mutation.target);
         <span class="hljs-keyword">this</span>.update();
         <span class="hljs-keyword">this</span>.handleItemLoadStart({ target: mutation.target });
@@ -210,9 +234,7 @@
   }
 
   nodeAdded(node) {
-    console.log(<span class="hljs-string">&#x27;Node added&#x27;</span>, node);
     <span class="hljs-keyword">if</span> (XPreloader.isLoaderNode(node)) {
-      console.log(<span class="hljs-string">&#x27;FOUND LOADER NODE:&#x27;</span>, node);
       node.addEventListener(<span class="hljs-string">&#x27;load&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemLoad);
       node.addEventListener(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemError);
 
@@ -223,7 +245,6 @@
       <span class="hljs-comment">// });</span>
 
       <span class="hljs-keyword">if</span> (!node.complete) {
-        console.log(<span class="hljs-string">&#x27;Node not complete&#x27;</span>, node);
         node.style.visibility = <span class="hljs-string">&#x27;hidden&#x27;</span>;
         <span class="hljs-keyword">this</span>.#queue.push(node);
         <span class="hljs-keyword">this</span>.update();
@@ -232,9 +253,7 @@
   }
 
   nodeRemoved(node) {
-    console.log(<span class="hljs-string">&#x27;Node removed&#x27;</span>, node);
     <span class="hljs-keyword">if</span> (XPreloader.isLoaderNode(node)) {
-      console.log(<span class="hljs-string">&#x27;FOUND LOADER NODE:&#x27;</span>, node);
       node.removeEventListener(<span class="hljs-string">&#x27;load&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemLoad);
       node.removeEventListener(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">this</span>.handleItemError);
 
@@ -243,7 +262,6 @@
   }
 
   handleSlotChange(e) {
-    console.log(<span class="hljs-string">&#x27;SLOT CHANGE&#x27;</span>, e.target.assignedNodes());
     <span class="hljs-keyword">const</span> removedNodes = <span class="hljs-keyword">this</span>.#assignedNodes.filter(x =&gt; !e.target.assignedNodes().includes(x));
     <span class="hljs-keyword">const</span> addedNodes = e.target.assignedNodes().filter(x =&gt; !<span class="hljs-keyword">this</span>.#assignedNodes.includes(x));
 
@@ -282,12 +300,10 @@
   }
 
   handleItemLoadStart(e) {
-    <span class="hljs-comment">// console.log(&#x27;$$$$$$$ Item load start&#x27;, e);</span>
   }
 
   handleItemLoad(e) {
     <span class="hljs-keyword">this</span>.#queue = <span class="hljs-keyword">this</span>.#queue.filter(x =&gt; x !== e.target);
-    console.log(<span class="hljs-string">&#x27;Item loaded&#x27;</span>, e.target, <span class="hljs-keyword">this</span>.#queue.length);
     
     e.target.style.visibility = <span class="hljs-string">&#x27;&#x27;</span>;
 
@@ -304,7 +320,6 @@
   }
 
   handleComplete() {
-    console.log(<span class="hljs-string">&#x27;******** Complete ********&#x27;</span>);
     <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--loading&#x27;</span>);
     <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--complete&#x27;</span>);
 
@@ -320,7 +335,6 @@
   }
 
   connectedCallback() {
-    console.log(<span class="hljs-string">&#x27;Connected&#x27;</span>);
   }
 }
 

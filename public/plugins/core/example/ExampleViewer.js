@@ -42,8 +42,8 @@
     document.querySelectorAll = new Proxy(document.querySelectorAll, {
       apply(target, thisArg, args, receiver) {
         const el = shadowHosts.reduce((acc, host) => {
-          return acc || host.shadowRoot.querySelectorAll(...args);
-        }, null);
+          return [...acc, ...host.shadowRoot.querySelectorAll(...args)];
+        }, []);
   
         if (el) {
           return el;
