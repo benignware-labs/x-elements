@@ -4,12 +4,59 @@
 
 # Preloader
 
+Helps with preloading media and components while visually indicating loading state.
+
+## Example
+
 <!-- Example -->
 
+
+Create a custom web component which is implementing the loading interface
+
+```js
+customElements.define('test-element', class TestElement extends HTMLElement {
+  #complete = false;
+
+  constructor() {
+    super();
+
+    this.handleLoad = this.handleLoad.bind(this);
+
+    this.attachShadow({mode: 'open'});
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+      <h4>Custom Element</h4>
+      <img class="img-fluid" src="https://baconmockup.com/640/360"/>
+    `;
+
+    this.shadowRoot
+      .querySelector('img')
+      .addEventListener('load', this.handleLoad);
+  }
+
+  handleLoad() {
+    this.#complete = true;
+    this.dispatchEvent(new CustomEvent('load')); 
+  }
+
+  get complete() {
+    return this.#complete;
+  }
+});
+```
+
+
+
+Let's give it some style.
+
 ```css
-img, test-element {
+img {
   aspect-ratio: 16/9;
-  max-width: 300px;
+  max-width: 250px;
 }
 
 .frame {
@@ -34,57 +81,12 @@ img, test-element {
 }
 ```
 
-```js
-customElements.define('test-element', class TestElement extends HTMLElement {
-  #complete = false;
-
-  constructor() {
-    super();
-
-    this.handleLoad = this.handleLoad.bind(this);
-
-    this.attachShadow({mode: 'open'});
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-      <h1>Hello World</h1>
-      <img class="img-fluid" src="https://baconmockup.com/640/360"/>
-    `;
-
-    const preloader = this.shadowRoot.querySelector('img');
-
-    preloader.addEventListener('load', () => {
-      console.log('!!!! loAded');
-      this.handleLoad();
-    });
-  }
-
-  handleLoad() {
-    console.log('loaded');
-    this.#complete = true;
-
-    const loadEvent = new CustomEvent('load');
-
-    this.dispatchEvent(loadEvent); 
-  }
-
-  get complete() {
-    return this.#complete;
-  }
-
-  connectedCallback() {
-    console.log('connected');
-  }
-});
-```
+Provide the actual markup for the preloader.
 
 ```html
 <div class="frame">
   <x-preloader class="preloader">
-    <h2>Load content</h2>
+    <h4>Images</h4>
     <div class="d-flex">
       <img
         id="test"
