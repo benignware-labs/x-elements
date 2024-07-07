@@ -11,7 +11,7 @@ The Ambience Component creates an atmospheric backdrop on images and video.
 ```html
 <x-ambience>
   <img
-    src="https://loremflickr.com/1280/640?lock=1234"
+    src="https://picsum.photos/id/134/800/450"
     style="aspect-ratio: 16/9; width: 100%; height: auto; "
   />
 </x-ambience>
@@ -26,10 +26,11 @@ The Ambience Component creates an atmospheric backdrop on images and video.
     id="video"
     style="aspect-ratio: 16/9; width: 100%; height: auto; "
     src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    autoplay
+    poster="https://picsum.photos/id/151/800/450"
     loop
     muted
     playsinline
+    controls
   ></video>
   </x-ambience>
 ```
