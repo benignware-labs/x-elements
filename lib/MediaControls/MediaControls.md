@@ -28,18 +28,20 @@ x-media-controls {
   --x-icon-pause: "\f04c";
   --x-icon-mute: "\f6a9";
   --x-icon-unmute: "\f028";
-  --x-volume-slider-expand: 1;
-
+ 
   border-radius: 0.5rem
 }
 
-x-media-controls::part(volume-control) {
-  order: 1;
+/*
+x-media-controls {
+ --x-volume-slider-expand: 0;
 }
 
-x-media-controls::part(fullscreen-button) {
-  order: 2;
+x-media-controls::part(volume-control),
+x-media-controls::part(play-button) {
+  order: -1;
 }
+*/
 ```
 
 Provide the actual markup
