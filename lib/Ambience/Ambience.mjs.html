@@ -1,0 +1,450 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - Ambience.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <!-- <style>
+      @font-face {
+        font-family: "EmojiSymbols";
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot");
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.svg#EmojiSymbols-Regular")format("svg");
+      }
+
+    </style> -->
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/segoe-fonts.min.css"> -->
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet"> -->
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/MediaControls.html"
+        
+        
+      >
+        MediaControls
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Ambience.html"
+        
+        
+      >
+        Ambience
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: Ambience.mjs</h1>
+      <p>
+        lib/Ambience/Ambience.mjs
+      </p>
+      
+      <pre><code class="hljs"><span class="hljs-keyword">import</span> { Preloader } from <span class="hljs-string">&quot;../../index.mjs&quot;</span>;
+
+export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">Ambience</span> <span class="hljs-title">extends</span> <span class="hljs-title">HTMLElement</span> {
+  #poster;
+  #slot;
+  #backdrop;
+  #canvas;
+  #mediaElement;
+
+  static MEDIA_CLASSES = [HTMLImageElement, HTMLVideoElement];
+  
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">super</span>();
+
+    <span class="hljs-keyword">this</span>.handleResize = <span class="hljs-keyword">this</span>.handleResize.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleSlotChange = <span class="hljs-keyword">this</span>.handleSlotChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.update = <span class="hljs-keyword">this</span>.update.bind(<span class="hljs-keyword">this</span>);
+
+    <span class="hljs-keyword">this</span>.attachShadow({ mode: <span class="hljs-string">&quot;open&quot;</span> });
+
+    <span class="hljs-comment">// this.backdrop = document.createElement(&quot;div&quot;);</span>
+
+    <span class="hljs-comment">// this.canvas = document.createElement(&quot;canvas&quot;);</span>
+    <span class="hljs-comment">// this.backdrop.appendChild(this.canvas);</span>
+
+    <span class="hljs-comment">// this.backdrop.style.outline = &#x27;1px solid red&#x27;;</span>
+    <span class="hljs-comment">// this.backdrop.style.position = &quot;absolute&quot;;</span>
+    <span class="hljs-comment">// this.backdrop.style.top = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.backdrop.style.left = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.backdrop.style.right = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.backdrop.style.bottom = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.backdrop.style.zIndex = &quot;-1&quot;;</span>
+
+    <span class="hljs-comment">// this.canvas.style.position = &quot;absolute&quot;;</span>
+    <span class="hljs-comment">// this.canvas.style.top = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.canvas.style.left = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.canvas.style.right = &quot;0&quot;;</span>
+    <span class="hljs-comment">// this.canvas.style.bottom = &quot;0&quot;;</span>
+   
+    <span class="hljs-comment">// const wrapper = document.createElement(&#x27;div&#x27;);</span>
+
+    <span class="hljs-comment">// wrapper.style.position = &quot;relative&quot;;</span>
+    <span class="hljs-comment">// wrapper.style.display = &quot;inline-block&quot;;</span>
+    
+    <span class="hljs-comment">// this.shadowRoot.appendChild(wrapper);</span>
+
+    <span class="hljs-comment">// wrapper.appendChild(this.backdrop);</span>
+
+    <span class="hljs-comment">// const content = document.createElement(&#x27;div&#x27;);</span>
+
+    <span class="hljs-comment">// content.style.position = &quot;relative&quot;;</span>
+    
+    <span class="hljs-comment">// wrapper.appendChild(content);</span>
+
+    <span class="hljs-comment">// this.#slot = document.createElement(&#x27;slot&#x27;);</span>
+    
+    <span class="hljs-comment">// content.appendChild(this.#slot);</span>
+
+    <span class="hljs-comment">// this.#poster = document.createElement(&quot;img&quot;);</span>
+
+    <span class="hljs-keyword">this</span>.shadowRoot.innerHTML = `
+      &lt;style&gt;
+        :host {
+          display: <span class="hljs-keyword">inline</span>-block;
+          position: relative;
+        }
+
+        :host::part(backdrop) {
+          position: absolute;
+          top: <span class="hljs-number">0</span>;
+          left: <span class="hljs-number">0</span>;
+          right: <span class="hljs-number">0</span>;
+          bottom: <span class="hljs-number">0</span>;
+          z-index: -<span class="hljs-number">1</span>;
+          filter: contrast(<span class="hljs-number">2</span>) blur(<span class="hljs-number">3.</span>5rem) opacity(<span class="hljs-number">0.5</span>) brightness(<span class="hljs-number">2.7</span>);
+        }
+
+        :host::part(poster) {
+          position: absolute;
+          top: <span class="hljs-number">0</span>;
+          left: <span class="hljs-number">0</span>;
+          right: <span class="hljs-number">0</span>;
+          bottom: <span class="hljs-number">0</span>;
+          width: <span class="hljs-number">100</span>%;
+          height: <span class="hljs-number">100</span>%;
+          <span class="hljs-keyword">object</span>-fit: cover;
+          outline: 2px solid red;
+        }
+
+        canvas {
+          position: absolute;
+          top: <span class="hljs-number">0</span>;
+          left: <span class="hljs-number">0</span>;
+          right: <span class="hljs-number">0</span>;
+          bottom: <span class="hljs-number">0</span>;
+        }
+      &lt;/style&gt;
+      
+     
+      &lt;div part=<span class="hljs-string">&quot;backdrop&quot;</span>&gt;
+        &lt;canvas part=<span class="hljs-string">&quot;canvas&quot;</span>&gt;&lt;/canvas&gt;
+      &lt;/div&gt;
+      
+      &lt;slot&gt;&lt;/slot&gt;
+    `;
+
+    <span class="hljs-keyword">this</span>.#slot = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;slot&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#poster = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part=&quot;poster&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#canvas = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part=&quot;canvas&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#backdrop = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part=&quot;backdrop&quot;]&#x27;</span>);
+  }
+
+  handleResize() {
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handleSlotChange(event) {
+    <span class="hljs-keyword">const</span> mediaElement = event.target
+      .assignedElements()
+      .find(element =&gt; Ambience.MEDIA_CLASSES.includes(element.<span class="hljs-keyword">constructor</span>));
+
+    <span class="hljs-keyword">if</span> (mediaElement !== <span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElement) {
+        <span class="hljs-comment">// Remove Event Listeners</span>
+      }
+
+      <span class="hljs-keyword">this</span>.#mediaElement = mediaElement;
+
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElement) {
+        <span class="hljs-comment">// Add Event Listeners</span>
+      }
+    }
+  
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  connectedCallback() {
+    window.addEventListener(<span class="hljs-string">&quot;resize&quot;</span>, <span class="hljs-keyword">this</span>.handleResize);
+    <span class="hljs-keyword">this</span>.#slot.addEventListener(<span class="hljs-string">&#x27;slotchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleSlotChange);
+
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  detachedCallback() {
+    window.removeEventListener(<span class="hljs-string">&quot;resize&quot;</span>, <span class="hljs-keyword">this</span>.handleResize);
+  }
+
+  update() {
+    requestAnimationFrame(() =&gt; <span class="hljs-keyword">this</span>.update()); <span class="hljs-comment">// wait for the brow</span>
+
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.targetElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+  
+    <span class="hljs-keyword">const</span> t = <span class="hljs-keyword">this</span>.targetElement; 
+
+    <span class="hljs-keyword">const</span> offset = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">const</span> style = getComputedStyle(t);
+    <span class="hljs-keyword">const</span> objectFit = style.objectFit;
+    <span class="hljs-keyword">const</span> borderRadius = style.borderRadius;
+    
+    <span class="hljs-keyword">this</span>.#canvas.style.transform = <span class="hljs-string">&quot;&quot;</span>;
+
+    <span class="hljs-keyword">const</span> ctx = <span class="hljs-keyword">this</span>.#canvas.getContext(<span class="hljs-string">&quot;2d&quot;</span>);
+
+    <span class="hljs-keyword">const</span> v = <span class="hljs-keyword">this</span>.targetElement;
+
+    <span class="hljs-keyword">const</span> isPoster = <span class="hljs-keyword">this</span>.targetElement.poster &amp;&amp; !<span class="hljs-keyword">this</span>.targetElement.played.length;
+
+    <span class="hljs-keyword">if</span> (isPoster) {
+      <span class="hljs-keyword">this</span>.#backdrop.style.background = `url(${<span class="hljs-keyword">this</span>.targetElement.poster}) no-repeat center center / cover`;
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> f = <span class="hljs-number">1</span> + offset / <span class="hljs-number">100</span>;
+    <span class="hljs-keyword">const</span> b = <span class="hljs-keyword">this</span>.targetElement.getBoundingClientRect();
+    <span class="hljs-keyword">const</span> w = b.width;
+    <span class="hljs-keyword">const</span> h = b.height;
+    
+    <span class="hljs-keyword">this</span>.#canvas.width = w;
+    <span class="hljs-keyword">this</span>.#canvas.height = h;
+  
+    <span class="hljs-keyword">const</span> sx = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">const</span> sy = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">const</span> sw = v.videoWidth || v.offsetWidth;
+    <span class="hljs-keyword">const</span> sh = v.videoHeight || v.offsetHeight;
+  
+    <span class="hljs-keyword">var</span> hRatio = w / sw;
+    <span class="hljs-keyword">var</span> vRatio = h / sh;
+    <span class="hljs-keyword">var</span> ratio  = objectFit === <span class="hljs-string">&#x27;cover&#x27;</span> ? Math.max ( hRatio, vRatio ) : Math.min ( hRatio, vRatio );
+  
+    <span class="hljs-keyword">const</span> dx = (( w - sw * ratio / f ) / <span class="hljs-number">2</span>);
+    <span class="hljs-keyword">const</span> dy = (( h - sh * ratio / f ) / <span class="hljs-number">2</span>);
+    <span class="hljs-keyword">const</span> dw = sw * ratio / f;
+    <span class="hljs-keyword">const</span> dh = sh * ratio / f;
+  
+    ctx.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, w, h);
+
+    <span class="hljs-keyword">const</span> [,borderTopLeftValue, borderTopLeftUnit] = style.borderTopLeftRadius.match(/(\d+)(px|%)/);
+    <span class="hljs-keyword">const</span> borderTopLeftRadius = borderTopLeftUnit === <span class="hljs-string">&#x27;px&#x27;</span> ? borderTopLeftValue : borderTopLeftValue * w / <span class="hljs-number">100</span>;
+    <span class="hljs-keyword">const</span> [,borderTopRightValue, borderTopRightUnit] = style.borderTopRightRadius.match(/(\d+)(px|%)/);
+    <span class="hljs-keyword">const</span> borderTopRightRadius = borderTopRightUnit === <span class="hljs-string">&#x27;px&#x27;</span> ? borderTopRightValue : borderTopRightValue * w / <span class="hljs-number">100</span>;
+    <span class="hljs-keyword">const</span> [,borderBottomLeftValue, borderBottomLeftUnit] = style.borderBottomLeftRadius.match(/(\d+)(px|%)/);
+    <span class="hljs-keyword">const</span> borderBottomLeftRadius = borderBottomLeftUnit === <span class="hljs-string">&#x27;px&#x27;</span> ? borderBottomLeftValue : borderBottomLeftValue * w / <span class="hljs-number">100</span>;
+    <span class="hljs-keyword">const</span> [,borderBottomRightValue, borderBottomRightUnit] = style.borderBottomRightRadius.match(/(\d+)(px|%)/);
+    <span class="hljs-keyword">const</span> borderBottomRightRadius = borderBottomRightUnit === <span class="hljs-string">&#x27;px&#x27;</span> ? borderBottomRightValue : borderBottomRightValue * w / <span class="hljs-number">100</span>;
+
+    <span class="hljs-keyword">const</span> tlr = borderTopLeftRadius;
+    <span class="hljs-keyword">const</span> trr = borderTopRightRadius;
+    <span class="hljs-keyword">const</span> blr = borderBottomLeftRadius;
+    <span class="hljs-keyword">const</span> brr = borderBottomRightRadius;
+
+    ctx.strokeStyle = <span class="hljs-string">&quot;transparent&quot;</span>;
+    ctx.beginPath();
+    ctx.roundRect(dx, dy, dw, dh, [tlr, trr, blr, brr]);
+    ctx.stroke();
+
+    ctx.clip();
+
+    ctx.drawImage(
+      v,
+      sx, sy, sw, sh,
+      dx, dy, dw, dh
+    );
+  }
+
+  <span class="hljs-keyword">get</span> targetElement() {
+    <span class="hljs-keyword">const</span> target = <span class="hljs-keyword">this</span>.dataset.target;
+
+    <span class="hljs-keyword">if</span> (target) {
+      <span class="hljs-keyword">return</span> document.querySelector(target);
+    }
+
+    <span class="hljs-keyword">const</span> element = <span class="hljs-keyword">this</span>.querySelector(<span class="hljs-string">&#x27;img, video&#x27;</span>);
+
+    <span class="hljs-keyword">return</span> element;
+  }
+}
+
+customElements.define(<span class="hljs-string">&#x27;x-ambience&#x27;</span>, Ambience);</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

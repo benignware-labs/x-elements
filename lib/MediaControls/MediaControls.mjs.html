@@ -1,0 +1,845 @@
+<html>
+  <head>
+    <base href="../.."/>
+    <title>x-elements - MediaControls.mjs</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <!-- <style>
+      @font-face {
+        font-family: "EmojiSymbols";
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot");
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.svg#EmojiSymbols-Regular")format("svg");
+      }
+
+    </style> -->
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/segoe-fonts.min.css"> -->
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet"> -->
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/MediaControls.html"
+        
+        
+      >
+        MediaControls
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Ambience.html"
+        
+        
+      >
+        Ambience
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>Source: MediaControls.mjs</h1>
+      <p>
+        lib/MediaControls/MediaControls.mjs
+      </p>
+      
+      <pre><code class="hljs"><span class="hljs-keyword">const</span> formatCurrentTime = (time, duration) =&gt; {
+  <span class="hljs-keyword">const</span> minutes = Math.floor(time / <span class="hljs-number">60</span>);
+  <span class="hljs-keyword">const</span> seconds = Math.floor(time % <span class="hljs-number">60</span>);
+
+  <span class="hljs-keyword">return</span> `${minutes}:${seconds.toString().padStart(<span class="hljs-number">2</span>, <span class="hljs-string">&#x27;0&#x27;</span>)}`;
+  
+};
+
+export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">MediaControls</span> <span class="hljs-title">extends</span> <span class="hljs-title">HTMLElement</span> {
+  #internals;
+  #slot;
+  #mediaElement;
+  #timeoutId;
+
+  #timeline;
+  #volumeSlider;
+  #currentTimeDisplay;
+  #durationDisplay;
+  #overlayPlayButton;
+
+  #volume;
+
+  static CONTROLS_TIMEOUT = <span class="hljs-number">3000</span>;
+
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">super</span>();
+
+    <span class="hljs-keyword">this</span>.handleSlotChange = <span class="hljs-keyword">this</span>.handleSlotChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handlePlay = <span class="hljs-keyword">this</span>.handlePlay.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handlePause = <span class="hljs-keyword">this</span>.handlePause.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleVolumeChange = <span class="hljs-keyword">this</span>.handleVolumeChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleClick = <span class="hljs-keyword">this</span>.handleClick.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleFullscreenChange = <span class="hljs-keyword">this</span>.handleFullscreenChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleTimelineChange = <span class="hljs-keyword">this</span>.handleTimelineChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleVolumeSliderChange = <span class="hljs-keyword">this</span>.handleVolumeSliderChange.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleTimeUpdate = <span class="hljs-keyword">this</span>.handleTimeUpdate.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleDblClick = <span class="hljs-keyword">this</span>.handleDblClick.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handlePointerMove = <span class="hljs-keyword">this</span>.handlePointerMove.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handlePointerLeave = <span class="hljs-keyword">this</span>.handlePointerLeave.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleLoadedData = <span class="hljs-keyword">this</span>.handleLoadedData.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.handleCanPlay = <span class="hljs-keyword">this</span>.handleCanPlay.bind(<span class="hljs-keyword">this</span>);
+
+    <span class="hljs-keyword">this</span>.update = <span class="hljs-keyword">this</span>.update.bind(<span class="hljs-keyword">this</span>);
+
+    <span class="hljs-keyword">this</span>.attachShadow({ mode: <span class="hljs-string">&quot;open&quot;</span> });
+
+    <span class="hljs-keyword">this</span>.#internals = <span class="hljs-keyword">this</span>.attachInternals();
+
+    <span class="hljs-keyword">const</span> html = `
+      &lt;style&gt;
+        :host {
+          display: <span class="hljs-keyword">inline</span>-flex;
+          position: relative;
+          overflow: hidden;
+          font-family: <span class="hljs-keyword">var</span>(--x-font-family, sans-serif);
+          font-size: <span class="hljs-keyword">var</span>(--x-font-size, <span class="hljs-number">0.</span>9rem);
+        }
+
+        *::slotted(video) {
+          <span class="hljs-comment">/*border: 1px solid blue;
+          outline: 2px solid yellow;*/</span>
+        }
+
+        <span class="hljs-comment">/* controls panel */</span>
+        :host::part(controls-panel) {
+          position: absolute;
+          left: <span class="hljs-number">0</span>;
+          right: <span class="hljs-number">0</span>;
+          bottom: <span class="hljs-number">0</span>;
+          background: <span class="hljs-keyword">var</span>(--x-controls-bg, color-mix(<span class="hljs-keyword">in</span> srgb, black <span class="hljs-number">45</span>%, transparent));
+          transform: translateY(<span class="hljs-number">100</span>%);
+          transition: all <span class="hljs-number">0.</span>3s ease-<span class="hljs-keyword">in</span>;
+          transition-delay: 0s;
+          opacity: <span class="hljs-number">0</span>;
+          padding: <span class="hljs-keyword">var</span>(--x-controls-padding-y, <span class="hljs-number">0.</span>5rem) <span class="hljs-keyword">var</span>(--x-controls-padding-x, <span class="hljs-number">0.</span>5rem);
+          
+          display: flex;
+          justify-content: start;
+          align-items: center;
+          gap: <span class="hljs-keyword">var</span>(--x-controls-gap, 1rem);
+        }
+
+        :host(:state(--paused))::part(controls-panel) {
+        }
+
+        :host(:state(--controlsvisible))::part(controls-panel) {
+          transform: translateY(<span class="hljs-number">0</span>);
+          transition-duration: <span class="hljs-number">0.</span>1s;
+          transition-delay: <span class="hljs-number">0.</span>1s;
+          opacity: <span class="hljs-number">1</span>;
+        }
+
+        <span class="hljs-comment">/* sliders */</span>
+        :host::part(slider) {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          cursor: pointer;
+          display: block;
+          width: max-content;
+          flex-grow: <span class="hljs-number">1</span>;
+          flex-shrink: <span class="hljs-number">1</span>;
+          min-width: 65px;
+        }
+
+        ${[
+          <span class="hljs-string">&#x27;-webkit-slider-runnable-track&#x27;</span>,
+          <span class="hljs-string">&#x27;-moz-range-track&#x27;</span>
+        ].map(selector =&gt; `
+          *::${selector} {
+            width: <span class="hljs-number">100</span>%;
+            height: <span class="hljs-keyword">var</span>(--x-slider-height, <span class="hljs-number">0.</span>5rem);
+            cursor: pointer;
+            box-shadow: <span class="hljs-keyword">var</span>(--x-slider-shadow, inset <span class="hljs-number">0</span> 1px 2px color-mix(<span class="hljs-keyword">in</span> srgb, black <span class="hljs-number">5</span>%, transparent));
+            background: <span class="hljs-keyword">var</span>(--x-slider-bg, color-mix(<span class="hljs-keyword">in</span> srgb, currentColor <span class="hljs-number">50</span>%, transparent));
+            border-radius: <span class="hljs-keyword">var</span>(--x-slider-radius, <span class="hljs-number">0.</span>5rem);
+            border-width: <span class="hljs-keyword">var</span>(--x-slider-border-width, <span class="hljs-number">0</span>);
+            border-style: <span class="hljs-keyword">var</span>(--x-slider-border-style, solid);
+            border-color: <span class="hljs-keyword">var</span>(--x-slider-border-color, #<span class="hljs-number">010101</span>);
+            display: flex;
+          }
+          
+          input[type=range]:focus::${selector} {
+            <span class="hljs-comment">/*background: initial;*/</span>
+          }
+        `).join(<span class="hljs-string">&#x27;\n&#x27;</span>)}
+
+        ${[
+          <span class="hljs-string">&#x27;-webkit-slider-thumb&#x27;</span>,
+          <span class="hljs-string">&#x27;-moz-range-thumb&#x27;</span>
+        ].map(selector =&gt; `
+          *::${selector} {
+            -webkit-appearance: none;
+            appearance: none;
+            width: <span class="hljs-keyword">var</span>(--x-slider-thumb-width, <span class="hljs-number">0.</span>5rem); 
+            height: <span class="hljs-keyword">var</span>(--x-slider-thumb-height, <span class="hljs-number">0.</span>5rem);
+            border-radius: <span class="hljs-number">50</span>%;
+            background: currentColor;
+            cursor: pointer;
+            margin-top: calc((<span class="hljs-keyword">var</span>(--x-slider-height, <span class="hljs-number">0.</span>5rem) - <span class="hljs-keyword">var</span>(--x-slider-thumb-height, <span class="hljs-number">0.</span>5rem)) / <span class="hljs-number">2</span>);
+          }
+        `).join(<span class="hljs-string">&#x27;\n&#x27;</span>)}
+
+        <span class="hljs-comment">/* control buttons */</span>
+        :host::part(control-button) {
+          aspect-ratio: <span class="hljs-number">1</span>;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          line-height: <span class="hljs-number">1</span>;
+          height: 1rem;
+          box-sizing: content-box;
+          cursor: pointer;
+        }
+
+        :host::part(control-button):before,
+        :host::part(overlay-play-button):before,
+        :host::part(control-button):after {
+          font-family: <span class="hljs-keyword">var</span>(--x-icon-font-family, monospace);
+          font-weight: <span class="hljs-keyword">var</span>(--x-icon-font-weight, normal);
+        }
+
+        <span class="hljs-comment">/* fullscreen button */</span>
+        :host::part(fullscreen-button) {
+          grid-area: fullscreen-button;
+          margin-left: auto;
+        }
+
+        :host::part(fullscreen-button)::before {
+          content: <span class="hljs-keyword">var</span>(--x-icon-expand, <span class="hljs-string">&#x27;⛶&#x27;</span>);
+        }
+
+        :host(:state(--fullscreen))::part(fullscreen-button)::before {
+          content: <span class="hljs-keyword">var</span>(--x-icon-collapse, <span class="hljs-string">&#x27;⛶&#x27;</span>);
+        }
+
+        <span class="hljs-comment">/* play button */</span>
+        :host::part(play-button) {
+        }
+
+        :host(:state(--paused))::part(play-button):before {
+          content: <span class="hljs-keyword">var</span>(--x-icon-play, <span class="hljs-string">&quot;▶&quot;</span>);
+        }
+
+        :host::part(play-button):before {
+          content: <span class="hljs-keyword">var</span>(--x-icon-pause, <span class="hljs-string">&#x27;⏸&#x27;</span>);
+        }
+
+        <span class="hljs-comment">/* mute button */</span>
+        :host::part(mute-button) {
+          position: relative;
+        }
+
+        :host::part(mute-button):before {
+          content: <span class="hljs-keyword">var</span>(--x-icon-unmute, <span class="hljs-string">&quot;\\1F50A&quot;</span>);
+        }
+
+        :host(:state(--muted))::part(mute-button):before {
+          <span class="hljs-comment">/* content: var(--x-icon-mute, &#x27;🔇&#x27;); */</span>
+        }
+
+        :host(:state(--muted))::part(mute-button):after {
+          <span class="hljs-comment">/*content: var(--x-icon-strike, &#x27;\\2298&#x27;);*/</span>
+          content: <span class="hljs-string">&#x27;&#x27;</span>;
+          display: block;
+          position: absolute;
+          left: <span class="hljs-number">0</span>;
+          top: <span class="hljs-number">0</span>;
+          height: 1rem;
+          aspect-ratio: <span class="hljs-number">1</span>;
+          color: red;
+          font-size: 2rem;
+          width: 1rem;
+          background: linear-gradient(to right top, transparent, transparent <span class="hljs-number">40</span>%, #eee <span class="hljs-number">40</span>%, #eee <span class="hljs-number">50</span>%, #<span class="hljs-number">333</span> <span class="hljs-number">50</span>%, #<span class="hljs-number">333</span> <span class="hljs-number">60</span>%, transparent <span class="hljs-number">60</span>%, transparent);
+        }
+
+        :host::part(time-display) {
+          display: flex;
+          flex-wrap: nowrap;
+          white-space: nowrap;
+        }
+
+        <span class="hljs-comment">/* duration-display */</span>
+        :host::part(duration) {
+          color: <span class="hljs-keyword">var</span>(--x-muted, color-mix(<span class="hljs-keyword">in</span> srgb, currentColor <span class="hljs-number">50</span>%, transparent));
+        }
+
+        :host::part(duration)::before {
+          content: <span class="hljs-string">&#x27; / &#x27;</span>;
+        }
+
+        <span class="hljs-comment">/* current-time-display */</span>
+        :host::part(current-time) {
+        }
+
+        :host::part(display) {
+          
+        }
+
+        :host::part(duration):empty {
+          display: none;
+        }
+
+        <span class="hljs-comment">/* overlay play button */</span>
+        :host::part(overlay-play-button) {
+          position: absolute;
+          top: <span class="hljs-number">50</span>%;
+          left: <span class="hljs-number">50</span>%;
+          transform: translate(-<span class="hljs-number">50</span>%, -<span class="hljs-number">50</span>%);
+          transition: all <span class="hljs-number">0.</span>3s ease-<span class="hljs-keyword">in</span>;
+          padding: <span class="hljs-number">1.</span>3rem;
+          font: <span class="hljs-keyword">var</span>(--x-icon-font, monospace);
+          font-size: 2rem;
+          background: <span class="hljs-keyword">var</span>(--x-controls-bg, color-mix(<span class="hljs-keyword">in</span> srgb, black <span class="hljs-number">45</span>%, transparent));
+          border-radius: <span class="hljs-number">50</span>%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-sizing: content-box;
+          cursor: pointer;
+          text-align: center;
+          opacity: <span class="hljs-number">0.5</span>;
+          transition: all <span class="hljs-number">0.</span>09s linear;
+          visibility: hidden;
+          aspect-ratio: <span class="hljs-number">1</span>;
+          height: 1em;
+        }
+
+        :host::part(overlay-play-button)::before {
+          content: <span class="hljs-keyword">var</span>(--x-icon-play, <span class="hljs-string">&quot;▶&quot;</span>);
+          display: block;
+          vertical-align: middle;
+        }
+
+        :host(:state(--canplay):state(--paused):not(:state(--played)))::part(overlay-play-button) {
+          opacity: <span class="hljs-number">1</span>;
+          transform: translate(-<span class="hljs-number">50</span>%, -<span class="hljs-number">50</span>%) scale(<span class="hljs-number">1</span>);
+          visibility: visible;
+        }
+
+        :host(:state(--played))::part(overlay-play-button) {
+          opacity: <span class="hljs-number">0</span>;
+          transform: translate(-<span class="hljs-number">50</span>%, -<span class="hljs-number">50</span>%) scale(<span class="hljs-number">2.5</span>);
+          transition: visibility 0s <span class="hljs-number">0.</span>4s, opacity <span class="hljs-number">0.</span>4s ease-<span class="hljs-keyword">out</span>, transform <span class="hljs-number">0.</span>4s ease-<span class="hljs-keyword">in</span>;
+          visibility: hidden;
+          pointer-events: none;
+          cursor: default;
+        }
+
+        <span class="hljs-comment">/* volume-control */</span>
+        .volume-control {
+          display: flex;
+          align-items: center;
+          position: relative;
+          margin-right: <span class="hljs-number">0</span>;
+        }
+
+        .volume-control:hover {
+        }
+
+        :host::part(volume-slider) {
+          transition: all <span class="hljs-number">0.</span>2s ease-<span class="hljs-keyword">in</span>;
+          width: 65px;
+        }
+
+        .volume-control &gt; input[type=range] {
+          max-width: calc(
+            5rem * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>) +
+            0rem * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>))
+          );
+          opacity: calc(
+            <span class="hljs-number">1</span> * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>) +
+            <span class="hljs-number">0</span> * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>))
+          );;
+          padding-left: calc(
+            <span class="hljs-number">0.</span>75rem * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>) +
+            0rem * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>))
+          );
+        } 
+
+        .volume-control:hover &gt; input[type=range] {
+          opacity: <span class="hljs-number">1</span>;
+          max-width: 5rem;
+          padding-left: <span class="hljs-number">0.</span>75rem;
+        }
+
+        <span class="hljs-comment">/* controlslist */</span>
+        :host([controlslist*=<span class="hljs-string">&quot;nofullscreen&quot;</span>])::part(fullscreen-button),
+        :host([controlslist*=<span class="hljs-string">&quot;noplay&quot;</span>])::part(play-button),
+        :host([controlslist*=<span class="hljs-string">&quot;nomute&quot;</span>])::part(mute-button),
+        :host([controlslist*=<span class="hljs-string">&quot;notimeline&quot;</span>])::part(timeline),
+        :host([controlslist*=<span class="hljs-string">&quot;novolumeslider&quot;</span>])::part(volume-slider) {
+          display: none;
+        }
+      &lt;/style&gt;
+      
+      &lt;slot&gt;&lt;/slot&gt;
+      &lt;div part=<span class="hljs-string">&quot;controls-panel&quot;</span>&gt;
+        &lt;div part=<span class="hljs-string">&quot;control-button play-button&quot;</span>&gt;&lt;/div&gt;
+        &lt;div part=<span class="hljs-string">&quot;volume-control&quot;</span> <span class="hljs-keyword">class</span>=<span class="hljs-string">&quot;volume-control&quot;</span>&gt;
+          &lt;div part=<span class="hljs-string">&quot;control-button mute-button&quot;</span>&gt;&lt;/div&gt;
+          &lt;input part=<span class="hljs-string">&quot;slider volume-slider&quot;</span> type=<span class="hljs-string">&quot;range&quot;</span>/&gt;
+        &lt;/div&gt;
+        &lt;input part=<span class="hljs-string">&quot;slider timeline&quot;</span> type=<span class="hljs-string">&quot;range&quot;</span>/&gt;
+        &lt;div part=<span class="hljs-string">&quot;time-display&quot;</span>&gt;
+          &lt;div part=<span class="hljs-string">&quot;display current-time&quot;</span>&gt;<span class="hljs-number">0</span>:<span class="hljs-number">00</span>&lt;/div&gt;
+          &lt;div part=<span class="hljs-string">&quot;display duration&quot;</span>&gt;<span class="hljs-number">0</span>:<span class="hljs-number">00</span>&lt;/div&gt;
+        &lt;/div&gt;
+        
+        &lt;div part=<span class="hljs-string">&quot;control-button fullscreen-button&quot;</span>&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div part=<span class="hljs-string">&quot;overlay-play-button&quot;</span>&gt;&lt;/div&gt;
+    `;
+
+    <span class="hljs-keyword">this</span>.shadowRoot.innerHTML = html;
+    <span class="hljs-keyword">this</span>.#slot = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;slot&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#timeline = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part*=&quot;timeline&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#currentTimeDisplay = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part*=&quot;current-time&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#durationDisplay = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part*=&quot;duration&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#volumeSlider = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part*=&quot;volume-slider&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#volumeSlider.value = <span class="hljs-number">100</span>;
+  }
+
+  handleSlotChange(event) {
+    <span class="hljs-keyword">const</span> mediaElement = event.target
+      .assignedElements()
+      .find(element =&gt; element instanceof HTMLMediaElement);
+
+    <span class="hljs-keyword">if</span> (mediaElement !== <span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElement) {
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;loadeddata&#x27;</span>, <span class="hljs-keyword">this</span>.handleLoadedData);
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;canplay&#x27;</span>, <span class="hljs-keyword">this</span>.handleCanPlay);
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;play&#x27;</span>, <span class="hljs-keyword">this</span>.handlePlay);
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;pause&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause);
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;timeupdate&#x27;</span>, <span class="hljs-keyword">this</span>.handleTimeUpdate);
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;durationchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleTimeUpdate);
+        <span class="hljs-keyword">this</span>.#mediaElement.removeEventListener(<span class="hljs-string">&#x27;volumechange&#x27;</span>, <span class="hljs-keyword">this</span>.handleVolumeChange);
+      }
+
+      <span class="hljs-keyword">this</span>.#mediaElement = mediaElement;
+
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElement) {
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;loadeddata&#x27;</span>, <span class="hljs-keyword">this</span>.handleLoadedData);
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;canplay&#x27;</span>, <span class="hljs-keyword">this</span>.handleCanPlay);
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;play&#x27;</span>, <span class="hljs-keyword">this</span>.handlePlay);
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;pause&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause);
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;timeupdate&#x27;</span>, <span class="hljs-keyword">this</span>.handleTimeUpdate);
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;durationchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleTimeUpdate);
+        <span class="hljs-keyword">this</span>.#mediaElement.addEventListener(<span class="hljs-string">&#x27;volumechange&#x27;</span>, <span class="hljs-keyword">this</span>.handleVolumeChange);
+
+        <span class="hljs-keyword">this</span>.#mediaElement.paused ? <span class="hljs-keyword">this</span>.showControls() : <span class="hljs-keyword">this</span>.hideControls(<span class="hljs-number">0</span>);
+        <span class="hljs-keyword">this</span>.#mediaElement.muted ? <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--muted&#x27;</span>) : <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--muted&#x27;</span>);
+        <span class="hljs-keyword">this</span>.#volumeSlider.value = <span class="hljs-keyword">this</span>.#mediaElement.muted ? <span class="hljs-number">0</span> : <span class="hljs-keyword">this</span>.#mediaElement.volume * <span class="hljs-number">100</span>;
+      }
+    }
+  
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  toggleFullscreen() {
+    <span class="hljs-keyword">if</span> (!document.fullscreenElement) {
+      <span class="hljs-keyword">this</span>.requestFullscreen().<span class="hljs-keyword">catch</span>((err) =&gt; {
+        alert(
+          `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`,
+        );
+      });
+    } <span class="hljs-keyword">else</span> {
+      document.exitFullscreen();
+    }
+  }
+
+  handleClick(event) {
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> isControlsPanel = !!event.target.closest(<span class="hljs-string">&#x27;[part*=&quot;controls-panel&quot;]&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (!isControlsPanel) {
+      <span class="hljs-keyword">this</span>.#mediaElement.paused ? <span class="hljs-keyword">this</span>.#mediaElement.play() : <span class="hljs-keyword">this</span>.#mediaElement.pause();
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> playButton = event.target.closest(<span class="hljs-string">&#x27;[part*=&quot;play-button&quot;]&#x27;</span>);
+    
+    <span class="hljs-keyword">if</span> (playButton) {
+      <span class="hljs-keyword">this</span>.#mediaElement.paused ? <span class="hljs-keyword">this</span>.#mediaElement.play() : <span class="hljs-keyword">this</span>.#mediaElement.pause();
+    }
+
+    <span class="hljs-keyword">const</span> muteButton = event.target.closest(<span class="hljs-string">&#x27;[part*=&quot;mute-button&quot;]&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (muteButton) {
+      console.log(<span class="hljs-string">&#x27;muteButton&#x27;</span>, muteButton, <span class="hljs-keyword">this</span>.#mediaElement.muted);
+      <span class="hljs-keyword">this</span>.#mediaElement.muted = !<span class="hljs-keyword">this</span>.#mediaElement.muted;
+    }
+
+    <span class="hljs-keyword">const</span> fullscreenButton = event.target.closest(<span class="hljs-string">&#x27;[part*=&quot;fullscreen-button&quot;]&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (fullscreenButton) {
+      <span class="hljs-keyword">this</span>.toggleFullscreen();
+    }
+  }
+
+  handlePlay(event) {
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--played&#x27;</span>);
+    <span class="hljs-keyword">this</span>.hideControls();
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handlePause(event) {
+    <span class="hljs-keyword">this</span>.showControls();
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handleVolumeChange() {
+    <span class="hljs-keyword">const</span> isMuted = <span class="hljs-keyword">this</span>.#mediaElement.muted;
+    <span class="hljs-keyword">const</span> volume = isMuted ? <span class="hljs-number">0</span> : <span class="hljs-keyword">this</span>.#mediaElement.volume;
+
+    <span class="hljs-keyword">this</span>.#volumeSlider.value = volume * <span class="hljs-number">100</span>;
+
+    <span class="hljs-keyword">if</span> (volume === <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--muted&#x27;</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--muted&#x27;</span>);
+    }
+  }
+
+  handleFullscreenChange(event) {
+    window.requestAnimationFrame(() =&gt; {
+      <span class="hljs-keyword">this</span>.update();
+    });
+  }
+
+  handleTimelineChange(event) {
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> newTime = <span class="hljs-keyword">this</span>.#mediaElement.duration * (event.target.value / <span class="hljs-number">100</span>);
+
+    <span class="hljs-keyword">this</span>.#mediaElement.currentTime = newTime;
+
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handleVolumeSliderChange(event) {
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+    
+    <span class="hljs-keyword">this</span>.#mediaElement.volume = event.target.value / <span class="hljs-number">100</span>;
+    <span class="hljs-keyword">this</span>.#mediaElement.muted = event.target.value &gt; <span class="hljs-number">0</span> ? <span class="hljs-literal">false</span> : <span class="hljs-literal">true</span>;
+
+    <span class="hljs-keyword">this</span>.handleVolumeChange();
+  }
+
+  handleDblClick(event) {
+    <span class="hljs-keyword">if</span> (event.target !== <span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">this</span>.toggleFullscreen();
+  }
+
+  handlePointerMove(event) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#timeoutId) {
+      clearTimeout(<span class="hljs-keyword">this</span>.#timeoutId);
+    }
+
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--controlsvisible&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElement.paused) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> originalTarget = event.composedPath()[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">const</span> isControls = !!originalTarget.closest(<span class="hljs-string">&#x27;[part*=&quot;controls&quot;]&#x27;</span>);
+
+    <span class="hljs-keyword">if</span> (isControls) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">this</span>.#timeoutId = setTimeout(() =&gt; {
+      <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--controlsvisible&#x27;</span>);
+    }, MediaControls.CONTROLS_TIMEOUT);
+  }
+
+  handlePointerLeave(event) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#timeoutId) {
+      clearTimeout(<span class="hljs-keyword">this</span>.#timeoutId);
+    }
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElement.paused) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--controlsvisible&#x27;</span>);
+  }
+
+  handleLoadedData(e) {
+    <span class="hljs-keyword">this</span>.#timeline.max = <span class="hljs-number">100</span>;
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--loadeddata&#x27;</span>);
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+
+  handleCanPlay(e) {
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--canplay&#x27;</span>);
+    <span class="hljs-keyword">this</span>.update();
+  }
+
+  handleTimeUpdate() {
+    <span class="hljs-keyword">const</span> value = (<span class="hljs-number">100</span> / <span class="hljs-keyword">this</span>.#mediaElement.duration) * <span class="hljs-keyword">this</span>.#mediaElement.currentTime;
+
+    <span class="hljs-keyword">if</span> (isNaN(value)) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">this</span>.#timeline.value = value;
+    <span class="hljs-keyword">this</span>.#currentTimeDisplay.textContent = formatCurrentTime(<span class="hljs-keyword">this</span>.#mediaElement.currentTime, <span class="hljs-keyword">this</span>.#mediaElement.duration);
+    <span class="hljs-keyword">this</span>.#durationDisplay.textContent = formatCurrentTime(<span class="hljs-keyword">this</span>.#mediaElement.duration);
+  }
+
+  connectedCallback() {
+    <span class="hljs-keyword">this</span>.#slot.addEventListener(<span class="hljs-string">&#x27;slotchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleSlotChange);
+    <span class="hljs-keyword">this</span>.shadowRoot.addEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">this</span>.handleClick);
+    <span class="hljs-keyword">this</span>.shadowRoot.addEventListener(<span class="hljs-string">&#x27;dblclick&#x27;</span>, <span class="hljs-keyword">this</span>.handleDblClick);
+    <span class="hljs-keyword">this</span>.addEventListener(<span class="hljs-string">&#x27;pointermove&#x27;</span>, <span class="hljs-keyword">this</span>.handlePointerMove);
+    <span class="hljs-keyword">this</span>.addEventListener(<span class="hljs-string">&#x27;pointerleave&#x27;</span>, <span class="hljs-keyword">this</span>.handlePointerLeave);
+    document.addEventListener(<span class="hljs-string">&#x27;fullscreenchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleFullscreenChange);
+    <span class="hljs-keyword">this</span>.#timeline.addEventListener(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-keyword">this</span>.handleTimelineChange);
+    <span class="hljs-keyword">this</span>.#volumeSlider.addEventListener(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-keyword">this</span>.handleVolumeSliderChange);
+  }
+
+  detachedCallback() {
+    <span class="hljs-keyword">this</span>.#slot.addEventListener(<span class="hljs-string">&#x27;slotchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleSlotChange);
+    <span class="hljs-keyword">this</span>.shadowRoot.removeEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">this</span>.handleClick);
+    <span class="hljs-keyword">this</span>.shadowRoot.removeEventListener(<span class="hljs-string">&#x27;dblclick&#x27;</span>, <span class="hljs-keyword">this</span>.handleDblClick);
+    <span class="hljs-keyword">this</span>.removeEventListener(<span class="hljs-string">&#x27;pointermove&#x27;</span>, <span class="hljs-keyword">this</span>.handlePointerMove);
+    <span class="hljs-keyword">this</span>.removeEventListener(<span class="hljs-string">&#x27;pointerleave&#x27;</span>, <span class="hljs-keyword">this</span>.handlePointerLeave);
+    document.removeEventListener(<span class="hljs-string">&#x27;fullscreenchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleFullscreenChange);
+    <span class="hljs-keyword">this</span>.#timeline.removeEventListener(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-keyword">this</span>.handleTimelineChange);
+    <span class="hljs-keyword">this</span>.#volumeSlider.removeEventListener(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-keyword">this</span>.handleVolumeSliderChange);
+  }
+
+  hideControls(timeout = MediaControls.CONTROLS_TIMEOUT) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#timeoutId) {
+      clearTimeout(<span class="hljs-keyword">this</span>.#timeoutId);
+    }
+
+    <span class="hljs-keyword">this</span>.#timeoutId = setTimeout(() =&gt; {
+      <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#mediaElement.paused) {
+        <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--controlsvisible&#x27;</span>);
+      }
+    }, timeout);
+  }
+
+  showControls() {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#timeoutId) {
+      clearTimeout(<span class="hljs-keyword">this</span>.#timeoutId);
+    }
+
+    <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--controlsvisible&#x27;</span>);
+  }
+
+  update() {
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#mediaElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> isPaused = <span class="hljs-keyword">this</span>.#mediaElement.paused;
+    <span class="hljs-keyword">const</span> isPlayed = <span class="hljs-keyword">this</span>.#mediaElement.played.length &gt; <span class="hljs-number">0</span>;
+    
+    <span class="hljs-keyword">const</span> isFullscreen = document.fullscreenElement === <span class="hljs-keyword">this</span> || document.fullscreenElement?.contains(<span class="hljs-keyword">this</span>);
+
+    
+    <span class="hljs-keyword">if</span> (isPaused) {
+      <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--paused&#x27;</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--paused&#x27;</span>);
+    }
+
+    <span class="hljs-keyword">if</span> (isPlayed) {
+      <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--played&#x27;</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-comment">// this.#internals.states.delete(&#x27;--played&#x27;);</span>
+    }
+
+    <span class="hljs-keyword">if</span> (isFullscreen) {
+      <span class="hljs-keyword">this</span>.#internals.states.add(<span class="hljs-string">&#x27;--fullscreen&#x27;</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.#internals.states.delete(<span class="hljs-string">&#x27;--fullscreen&#x27;</span>);
+    }
+  }
+}
+
+customElements.define(<span class="hljs-string">&#x27;x-media-controls&#x27;</span>, MediaControls);</code></pre>
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

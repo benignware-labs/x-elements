@@ -8,6 +8,26 @@
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
 
+    <!-- <style>
+      @font-face {
+        font-family: "EmojiSymbols";
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot");
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.svg#EmojiSymbols-Regular")format("svg");
+      }
+
+    </style> -->
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/segoe-fonts.min.css"> -->
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet"> -->
+
     <script src="public/plugins/core/example/ExampleViewer.js"></script>
               <script type="importmap">
               {
@@ -131,6 +151,36 @@
     </li>
     
   
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/MediaControls.html"
+        
+        
+      >
+        MediaControls
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Ambience.html"
+        
+        
+      >
+        Ambience
+      </a>
+      
+    </li>
+    
+  
 </ul>
       
     </li>
@@ -145,9 +195,7 @@
         lib/Panel/PanelManager.mjs
       </p>
       
-      <pre><code class="hljs"><span class="hljs-comment">// (panel) =&gt; panel.getAttribute(&#x27;group&#x27;) || panel.dataset.group,</span>
-
-export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">PanelManager</span> {
+      <pre><code class="hljs">export default <span class="hljs-keyword">class</span> <span class="hljs-title class_">PanelManager</span> {
   #options;
   #panels;
   #next = <span class="hljs-literal">null</span>;
@@ -181,18 +229,19 @@ export default <span class="hljs-keyword">class</span> <span class="hljs-title c
     }
   }
 
-  remove(panel) {
-    p.removeEventListener(<span class="hljs-string">&#x27;x-panel:shown&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
-    p.removeEventListener(<span class="hljs-string">&#x27;x-panel:hidden&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
-    <span class="hljs-keyword">this</span>.#panels.delete(panel);
+  remove(...panel) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> p of panel) {
+      p.removeEventListener(<span class="hljs-string">&#x27;x-panel:shown&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
+      p.removeEventListener(<span class="hljs-string">&#x27;x-panel:hidden&#x27;</span>, <span class="hljs-keyword">this</span>._handleState);
+      <span class="hljs-keyword">this</span>.#panels.delete(panel);
+    }
   }
 
   clear() {
-    <span class="hljs-keyword">this</span>.#panels.clear();
+    <span class="hljs-keyword">this</span>.#panels.forEach(panel =&gt; <span class="hljs-keyword">this</span>.remove(panel));
   }
 
   <span class="hljs-keyword">set</span>(group) {
-    console.log(<span class="hljs-string">&#x27;set&#x27;</span>, group);
     <span class="hljs-keyword">this</span>.#next = group;
 
     <span class="hljs-keyword">this</span>._handleState();
@@ -203,7 +252,6 @@ export default <span class="hljs-keyword">class</span> <span class="hljs-title c
   }
   
   _handleState() {
-    console.log(<span class="hljs-string">&#x27;HANDLE STATE&#x27;</span>, <span class="hljs-keyword">this</span>.#next);
     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#next === <span class="hljs-literal">null</span>) {
       <span class="hljs-keyword">return</span>;
     }
@@ -213,21 +261,12 @@ export default <span class="hljs-keyword">class</span> <span class="hljs-title c
     <span class="hljs-keyword">const</span> groupBy = typeof <span class="hljs-keyword">this</span>.#options.groupBy === <span class="hljs-string">&#x27;string&#x27;</span> ? (panel) =&gt; panel.getAttribute(<span class="hljs-keyword">this</span>.#options.groupBy) : <span class="hljs-keyword">this</span>.#options.groupBy;
 
     <span class="hljs-keyword">const</span> others = panels.filter(panel =&gt; groupBy(panel) !== <span class="hljs-keyword">this</span>.#next);
-
-    console.log(<span class="hljs-string">&#x27;others: &#x27;</span>, <span class="hljs-keyword">this</span>.#next, others.length);
     
     others.forEach(panel =&gt; panel.hidden = <span class="hljs-literal">true</span>);
 
     <span class="hljs-keyword">const</span> othersHidden = others.every(panel =&gt; panel.state === <span class="hljs-string">&#x27;hidden&#x27;</span>);
 
-    console.log(<span class="hljs-string">&#x27;states&#x27;</span>, others.map(panel =&gt; panel.state), othersHidden);
-
     <span class="hljs-keyword">if</span> (othersHidden &amp;&amp; <span class="hljs-keyword">this</span>.#current !== <span class="hljs-keyword">this</span>.#next) {
-      console.log(<span class="hljs-string">&#x27;SHOW IT&#x27;</span>, <span class="hljs-keyword">this</span>.#next);
-
-      console.log(panels
-        .map(panel =&gt; groupBy(panel)));
-      
       panels
         .filter(panel =&gt; groupBy(panel) === <span class="hljs-keyword">this</span>.#next)
         .forEach(panel =&gt; panel.hidden = <span class="hljs-literal">false</span>)

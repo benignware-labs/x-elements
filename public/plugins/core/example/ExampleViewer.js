@@ -1,9 +1,13 @@
 (() => {
+  const shadowHosts = [];
+
   Element.prototype.querySelector = new Proxy(Element.prototype.querySelector, {
     apply(target, thisArg, args, receiver) {
-      const el = shadowHosts.reduce((acc, host) => {
-        return acc || host.shadowRoot.querySelector(...args);
-      }, null);
+      const el = shadowHosts
+        .filter(host => thisArg === host || thisArg.contains(host))
+        .reduce((acc, host) => {
+          return acc || host.shadowRoot.querySelector(...args);
+        }, null);
 
       if (el) {
         return el;
@@ -13,7 +17,23 @@
     }
   });
 
-  const shadowHosts = [];
+  const contains = Element.prototype.contains;
+
+  Element.prototype.contains = new Proxy(contains, {
+    apply(target, thisArg, args, receiver) {
+      const el = shadowHosts
+        .filter(host => thisArg === host || contains.call(thisArg, host))
+        .reduce((acc, host) => {
+          return acc || host.shadowRoot.contains(...args);
+        }, null);
+
+      if (el) {
+        return el;
+      }
+
+      return target.apply(thisArg, args, receiver);
+    }
+  });
 
   const addShadowHost = (host) => {
     shadowHosts.push(host);
@@ -117,6 +137,39 @@
       const content = template.content.cloneNode(true);
   
       this.shadowRoot.appendChild(content);
+
+      const cssrefs = this.shadowRoot.querySelectorAll('link[rel="stylesheet"]');
+
+      cssrefs.forEach((link) => {
+        link.addEventListener('load', (event) => {
+          console.log('loaded', event.currentTarget.sheet);
+          for (
+            let i = 0;
+            i < event.currentTarget.sheet.cssRules.length;
+            i++
+        ) {
+            if (event.currentTarget.sheet.cssRules[i].type == 5) { // type 5 is @font-face
+                const split = event.currentTarget.href.split('/');
+                const stylePath = split
+                    .slice(0, split.length - 1)
+                    .join('/');
+                let cssText =
+                    event.currentTarget.sheet.cssRules[i].cssText;
+                cssText = cssText.replace(
+                    // relative paths
+                    /url\s*\(\s*[\'"]?(?!((\/)|((?:https?:)?\/\/)|(?:data\:?:)))([^\'"\)]+)[\'"]?\s*\)/g,
+                    `url("${stylePath}/$4")`
+                );
+
+                const st = document.createElement('style');
+                st.appendChild(document.createTextNode(cssText));
+                document
+                    .getElementsByTagName('head')[0]
+                    .appendChild(st);
+            }
+        }
+        });
+      });
     }
 
     disconnectedCallback() {

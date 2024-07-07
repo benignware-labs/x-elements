@@ -1,0 +1,292 @@
+<html>
+  <head>
+    <base href=".."/>
+    <title>x-elements - MediaControls</title>
+
+    <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
+    <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
+    <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
+    <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+
+    <!-- <style>
+      @font-face {
+        font-family: "EmojiSymbols";
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot");
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.svg#EmojiSymbols-Regular")format("svg");
+      }
+
+    </style> -->
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/segoe-fonts.min.css"> -->
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet"> -->
+
+    <script src="public/plugins/core/example/ExampleViewer.js"></script>
+              <script type="importmap">
+              {
+                "imports": {
+                  "x-elements": "./public/index.mjs"
+                }
+              }
+            </script>
+              <script src="public/index.mjs" type="module"></script>
+            
+  </head>
+  <body class="markdown-body flex-column">
+    <div class="header flex">
+      <a class="header-brand" href="./index.html">x-elements</a>
+      
+<ul class="menu flex align-center justify-center">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      <nav class="links">
+        
+          
+            
+              <a href="https://github.com/benignware-labs/x-elements.git">
+                
+                <i class="fa-brands fa-github"></i>
+                <!--<label>github</label>-->
+              </a>
+            
+          
+        
+      </nav>
+    </div>
+      
+      
+
+<main class="flex-grow flex h-100">
+  <div class="sidebar sidebar-left border-right mr-2 flex-noshrink">
+  
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+          role="button"
+          
+          aria-expanded="false"
+        
+      >
+        Components
+      </a>
+      
+        
+<ul class="menu">
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Select.html"
+        
+        
+      >
+        Select
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Preloader.html"
+        
+        
+      >
+        Preloader
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Panel.html"
+        
+        
+      >
+        Panel
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link active"
+        
+          href="components/MediaControls.html"
+        
+        
+      >
+        MediaControls
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Ambience.html"
+        
+        
+      >
+        Ambience
+      </a>
+      
+    </li>
+    
+  
+</ul>
+      
+    </li>
+    
+  
+</ul>
+</div>
+  <div class="flex-grow">
+    <div class="container py-4">
+      <h1>MediaControls</h1>
+      <p>Consistent media controls across browsers</p>
+<h2>Example</h2>
+<p>
+
+  <template id="example-5-template">
+    
+
+    <style>x-media-controls {
+  --x-icon-font-family: "Font Awesome 6 Free";
+  --x-icon-font-weight: 900;
+  --x-icon-expand: "\f065";
+  --x-icon-collapse: "\f066";
+  --x-icon-play: "\f04b";
+  --x-icon-pause: "\f04c";
+  --x-icon-mute: "\f6a9";
+  --x-icon-unmute: "\f028";
+  --x-volume-slider-expand: 1;
+
+  border-radius: 0.5rem
+}
+
+x-media-controls::part(volume-control) {
+  order: 1;
+}
+
+x-media-controls::part(fullscreen-button) {
+  order: 2;
+}
+</style>
+
+    <div class="example-body">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<x-media-controls controlslist="">
+  <video
+    style="width: 100%; height: auto;"
+    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    poster="https://picsum.photos/id/211/800/450"
+    loop
+    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+    muted
+  ></video>
+</x-media-controls>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-5-viewer" template="#example-5-template">
+
+  </example-viewer>
+</p>
+<p>Obtain Font Awesome from cdn</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">referrerpolicy</span>=<span class="hljs-string">&quot;no-referrer&quot;</span> /&gt;</span>
+</code></pre>
+<p>Define our custom icons, have volume slider expanded and move volume control before fullscreen button.</p>
+<pre><code class="hljs">x-media-controls {
+  <span class="hljs-attr">--x-icon-font-family</span>: <span class="hljs-string">&quot;Font Awesome 6 Free&quot;</span>;
+  <span class="hljs-attr">--x-icon-font-weight</span>: <span class="hljs-number">900</span>;
+  <span class="hljs-attr">--x-icon-expand</span>: <span class="hljs-string">&quot;\f065&quot;</span>;
+  <span class="hljs-attr">--x-icon-collapse</span>: <span class="hljs-string">&quot;\f066&quot;</span>;
+  <span class="hljs-attr">--x-icon-play</span>: <span class="hljs-string">&quot;\f04b&quot;</span>;
+  <span class="hljs-attr">--x-icon-pause</span>: <span class="hljs-string">&quot;\f04c&quot;</span>;
+  <span class="hljs-attr">--x-icon-mute</span>: <span class="hljs-string">&quot;\f6a9&quot;</span>;
+  <span class="hljs-attr">--x-icon-unmute</span>: <span class="hljs-string">&quot;\f028&quot;</span>;
+  <span class="hljs-attr">--x-volume-slider-expand</span>: <span class="hljs-number">1</span>;
+
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.5rem</span>
+}
+
+x-media-controls<span class="hljs-selector-pseudo">::part</span>(volume-control) {
+  <span class="hljs-attribute">order</span>: <span class="hljs-number">1</span>;
+}
+
+x-media-controls<span class="hljs-selector-pseudo">::part</span>(fullscreen-<span class="hljs-selector-tag">button</span>) {
+  <span class="hljs-attribute">order</span>: <span class="hljs-number">2</span>;
+}
+</code></pre>
+<p>Provide the actual markup</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+    <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto;&quot;</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/211/800/450&quot;</span>
+    <span class="hljs-attr">loop</span>
+    <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
+    <span class="hljs-attr">muted</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-media-controls</span>&gt;</span>
+</code></pre>
+
+    </div>
+  </div>
+</main>
+
+    <div class="footer">
+      <div class="center">
+        Powered by <a target="_blank" href="https://benignware.com">Benignware</a>
+      </div>
+    </div>
+  </body>
+</html>

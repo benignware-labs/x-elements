@@ -8,6 +8,26 @@
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
 
+    <!-- <style>
+      @font-face {
+        font-family: "EmojiSymbols";
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot");
+        src: url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/5b026bf0b879e4356472ed8c36dc48c7.svg#EmojiSymbols-Regular")format("svg");
+      }
+
+    </style> -->
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/segoe-fonts.min.css"> -->
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet"> -->
+
     <script src="public/plugins/core/example/ExampleViewer.js"></script>
               <script type="importmap">
               {
@@ -131,6 +151,36 @@
     </li>
     
   
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/MediaControls.html"
+        
+        
+      >
+        MediaControls
+      </a>
+      
+    </li>
+    
+  
+    
+    <li class="menu-item">
+      <a 
+        class="menu-link"
+        
+          href="components/Ambience.html"
+        
+        
+      >
+        Ambience
+      </a>
+      
+    </li>
+    
+  
 </ul>
       
     </li>
@@ -169,17 +219,16 @@ class Panel extends HTMLElement {
 
     this.#internals.states.add(&#x27;--shown&#x27;);
 
-    console.log(&#x27;ADD TRANSITION HANDLER&#x27;, this.dataset);
     host.addEventListener(&#x27;transitionend&#x27;, this.handleTransitionEnd);
   }
 
   handleTransitionEnd(event) {
-    console.log(&#x27;TRANSITION END&#x27;, event.target, event.propertyName, event.elapsedTime);
+    if (event.target !== this.shadowRoot.host) return;
+  
     const target = event.target
     const style = window.getComputedStyle(target);
     
-
-    let fullyShown = false;
+    let fullyVisible = false;
     let fullyHidden = false;
 
     if (event.propertyName === &#x27;transform&#x27;) {
@@ -189,35 +238,23 @@ class Panel extends HTMLElement {
       const sx = matrix.a;
       const sy = matrix.d;
       
-      const orientations = this.orientation.split(&#x27; &#x27;);
+      const { width, height } = target.getBoundingClientRect();
 
-      const width = target.offsetWidth;
-      const height = target.offsetHeight;
+      const fullyVisibleX = x === 0;
+      const fullyVisibleY = y === 0;
+      const fullyVisibleWidth = sx === 1;
+      const fullyVisibleHeight = sy === 1;
 
-      if (orientations.includes(&#x27;top&#x27;)) {
-        fullyShown = y === 0;
-        fullyHidden = y === -height;
-      } else if (orientations.includes(&#x27;bottom&#x27;)) {
-        fullyShown = y === 0;
-        fullyHidden = y === height;
-      } else if (orientations.includes(&#x27;left&#x27;)) {
-        fullyShown = x === 0;
-        fullyHidden = x === -width;
-      } else if (orientations.includes(&#x27;right&#x27;)) {
-        fullyShown = x === 0;
-        fullyHidden = x === width;
-      } else if (orientations.includes(&#x27;center&#x27;)) {
-        fullyShown = sx === 1 &amp;&amp; sy === 1;
-        fullyHidden = sx === 0 &amp;&amp; sy === 0;
-      }
+      fullyVisible = fullyVisibleX &amp;&amp; fullyVisibleY &amp;&amp; fullyVisibleWidth &amp;&amp; fullyVisibleHeight;
+      fullyHidden = !fullyVisible;
     }
 
     if (event.propertyName === &#x27;opacity&#x27;) {
-      fullyShown = style.opacity === &#x27;1&#x27;;
+      fullyVisible = style.opacity === &#x27;1&#x27;;
       fullyHidden = style.opacity === &#x27;0&#x27;;
     }
 
-    if (fullyShown) {
+    if (fullyVisible) {
       this.#internals.states.add(&#x27;--shown&#x27;);
       this.#internals.states.delete(&#x27;--showing&#x27;);
     }
@@ -227,19 +264,42 @@ class Panel extends HTMLElement {
       this.#internals.states.delete(&#x27;--hiding&#x27;);
     }
 
-    if (fullyShown) {
-      console.log(&#x27;shown&#x27;);
+    if (fullyVisible || fullyHidden) {
+      this.endAnimation();
+    }
+
+    if (fullyVisible) {
       this.dispatchEvent(new CustomEvent(&#x27;x-panel:shown&#x27;));
     }
 
     if (fullyHidden) {
-      console.log(&#x27;hidden&#x27;);
       this.dispatchEvent(new CustomEvent(&#x27;x-panel:hidden&#x27;));
     }
+
+    
+  }
+
+  startAnimation() {
+    this._animating = true;
+
+    this.animate();
+  }
+
+  
+  endAnimation() {
+    this._animating = false;
+  }
+
+  animate() {
+    if (!this._animating) return;
+    
+    const event = new CustomEvent(&#x27;x-panel:animate&#x27;);
+    this.dispatchEvent(event);
+
+    window.requestAnimationFrame(() =&gt; this.animate());
   }
 
   connectedCallback() {
-    console.log(&#x27;*** CONNECTED CALLBACK&#x27;, this.dataset.scene, [...this.#internals.states.values()]);
     this.render();
 
     window.requestAnimationFrame(() =&gt; {
@@ -248,11 +308,9 @@ class Panel extends HTMLElement {
   }
 
   render() {
-    console.log(&#x27;RENDER&#x27;);
-    
     this.shadowRoot.innerHTML = `
       <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">
-        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span>) {
+        <span class="hljs-selector-pseudo">:host</span>(x-panel<span class="hljs-selector-attr">[hidden]</span>) {
           <span class="hljs-attribute">display</span>: block <span class="hljs-meta">!important</span>;
         }
 
@@ -344,13 +402,16 @@ class Panel extends HTMLElement {
           <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translate</span>(-<span class="hljs-number">50%</span>, -<span class="hljs-number">50%</span>) <span class="hljs-built_in">scale</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
         }
 
-        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span>) {
+        <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;left&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;right&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;top&quot;</span>]</span><span class="hljs-selector-attr">[orientation*=<span class="hljs-string">&quot;bottom&quot;</span>]</span><span class="hljs-selector-pseudo">:where</span>(<span class="hljs-selector-attr">[animation=<span class="hljs-string">&#x27;slide&#x27;</span>]</span>,<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[animation]</span>))) {
           <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">scale</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
         }
 
         <span class="hljs-selector-pseudo">:host</span>(<span class="hljs-selector-attr">[hidden]</span><span class="hljs-selector-attr">[animation*=<span class="hljs-string">&#x27;fade&#x27;</span>]</span>) {
           <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0</span>;
+          <span class="hljs-attribute">visibility</span>: hidden;
+          <span class="hljs-attribute">transition</span>: visibility <span class="hljs-number">0s</span> <span class="hljs-number">0.33s</span>, opacity <span class="hljs-number">0.33s</span> linear;
         }
+
       </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">slot</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
     `;
@@ -399,17 +460,17 @@ class Panel extends HTMLElement {
     if (oldValue === newValue) return;
 
     if (name === &#x27;hidden&#x27;) {
-      
       const hidden = this.hasAttribute(&#x27;hidden&#x27;);
+      const isInitialized = this.#internals.states.has(&#x27;--initialized&#x27;);
 
       if (hidden) {
-        console.log(&#x27;HIDE&#x27;, this.dataset.scene, this.isConnected,  this.parentNode);
+        this.dispatchEvent(new CustomEvent(&#x27;x-panel:hide&#x27;));
       } else {
-        console.log(&#x27;SHOW&#x27;, this.dataset.scene, this.isConnected, this.parentNode);
+        this.dispatchEvent(new CustomEvent(&#x27;x-panel:show&#x27;));
       }
 
       if (hidden) {
-        if (this.#internals.states.has(&#x27;--initialized&#x27;)) {
+        if (isInitialized) {
           this.#internals.states.delete(&#x27;--shown&#x27;);
           this.#internals.states.delete(&#x27;--showing&#x27;);
           this.#internals.states.add(&#x27;--hiding&#x27;);
@@ -417,13 +478,17 @@ class Panel extends HTMLElement {
           this.#internals.states.add(&#x27;--hidden&#x27;);
         }
       } else {
-        if (this.#internals.states.has(&#x27;--initialized&#x27;)) {
+        if (isInitialized) {
           this.#internals.states.delete(&#x27;--hidden&#x27;);
           this.#internals.states.delete(&#x27;--hiding&#x27;);
           this.#internals.states.add(&#x27;--showing&#x27;);
         } else {
           this.#internals.states.add(&#x27;--shown&#x27;);
         }
+      }
+
+      if (this.#internals.states.has(&#x27;--initialized&#x27;)) {
+        this.startAnimation();
       }
 
       return;
@@ -433,7 +498,9 @@ class Panel extends HTMLElement {
   }
 }
 
-customElements.define(&#x27;x-panel&#x27;, Panel);
+if (!customElements.get(&#x27;x-panel&#x27;)) {
+  customElements.define(&#x27;x-panel&#x27;, Panel);
+}
 
 export default Panel;</code></pre>
     </div>
