@@ -33,7 +33,6 @@ var XPreloader = class _XPreloader extends HTMLElement {
           opacity: 0;
           transition: opacity 0.3s;
           width: 100%;
-          height: 100%;
         }
 
         :host(:state(--complete)) .body {
