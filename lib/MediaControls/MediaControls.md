@@ -47,6 +47,7 @@ x-media-controls::part(play-button) {
 Provide the actual markup
 
 ```html
+<x-ambience>
 <x-media-controls controlslist="">
   <video
     style="width: 100%; height: auto;"
@@ -57,4 +58,5 @@ Provide the actual markup
     muted
   ></video>
 </x-media-controls>
+</x-ambience>
 ```
