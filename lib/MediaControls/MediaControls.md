@@ -48,15 +48,15 @@ Provide the actual markup
 
 ```html
 <x-ambience>
-<x-media-controls controlslist="">
-  <video
-    style="width: 100%; height: auto;"
-    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    poster="https://picsum.photos/id/211/800/450"
-    loop
-    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
-    muted
-  ></video>
-</x-media-controls>
+  <x-media-controls controlslist="">
+    <video
+      style="width: 100%; height: auto;"
+      src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://picsum.photos/id/211/800/450"
+      loop
+      onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+      muted
+    ></video>
+  </x-media-controls>
 </x-ambience>
 ```
