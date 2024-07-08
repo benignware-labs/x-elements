@@ -207,32 +207,36 @@
   --x-icon-pause: "\f04c";
   --x-icon-mute: "\f6a9";
   --x-icon-unmute: "\f028";
-  --x-volume-slider-expand: 1;
-
+ 
   border-radius: 0.5rem
 }
 
-x-media-controls::part(volume-control) {
-  order: 1;
+/*
+x-media-controls {
+ --x-volume-slider-expand: 0;
 }
 
-x-media-controls::part(fullscreen-button) {
-  order: 2;
+x-media-controls::part(volume-control),
+x-media-controls::part(play-button) {
+  order: -1;
 }
+*/
 </style>
 
     <div class="example-body">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<x-media-controls controlslist="">
-  <video
-    style="width: 100%; height: auto;"
-    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    poster="https://picsum.photos/id/211/800/450"
-    loop
-    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
-    muted
-  ></video>
-</x-media-controls>
+<x-ambience>
+  <x-media-controls controlslist="">
+    <video
+      style="width: 100%; height: auto;"
+      src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://picsum.photos/id/211/800/450"
+      loop
+      onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+      muted
+    ></video>
+  </x-media-controls>
+</x-ambience>
 
     </div>
   </template>
@@ -253,30 +257,34 @@ x-media-controls::part(fullscreen-button) {
   <span class="hljs-attr">--x-icon-pause</span>: <span class="hljs-string">&quot;\f04c&quot;</span>;
   <span class="hljs-attr">--x-icon-mute</span>: <span class="hljs-string">&quot;\f6a9&quot;</span>;
   <span class="hljs-attr">--x-icon-unmute</span>: <span class="hljs-string">&quot;\f028&quot;</span>;
-  <span class="hljs-attr">--x-volume-slider-expand</span>: <span class="hljs-number">1</span>;
-
+ 
   <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.5rem</span>
 }
 
-x-media-controls<span class="hljs-selector-pseudo">::part</span>(volume-control) {
-  <span class="hljs-attribute">order</span>: <span class="hljs-number">1</span>;
+<span class="hljs-comment">/*
+x-media-controls {
+ --x-volume-slider-expand: 0;
 }
 
-x-media-controls<span class="hljs-selector-pseudo">::part</span>(fullscreen-<span class="hljs-selector-tag">button</span>) {
-  <span class="hljs-attribute">order</span>: <span class="hljs-number">2</span>;
+x-media-controls::part(volume-control),
+x-media-controls::part(play-button) {
+  order: -1;
 }
+*/</span>
 </code></pre>
 <p>Provide the actual markup</p>
-<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;&quot;</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
-    <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto;&quot;</span>
-    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
-    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/211/800/450&quot;</span>
-    <span class="hljs-attr">loop</span>
-    <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
-    <span class="hljs-attr">muted</span>
-  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">x-media-controls</span>&gt;</span>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+      <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto;&quot;</span>
+      <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+      <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/211/800/450&quot;</span>
+      <span class="hljs-attr">loop</span>
+      <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
+      <span class="hljs-attr">muted</span>
+    &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">x-media-controls</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
 </code></pre>
 
     </div>

@@ -297,7 +297,12 @@ export default <span class="hljs-keyword">class</span> <span class="hljs-title c
           width: max-content;
           flex-grow: <span class="hljs-number">1</span>;
           flex-shrink: <span class="hljs-number">1</span>;
+        }
+
+        :host::part(timeline) {
           min-width: 65px;
+          flex-grow: <span class="hljs-number">1</span>;
+          flex-shrink: <span class="hljs-number">1</span>;
         }
 
         ${[
@@ -502,16 +507,16 @@ export default <span class="hljs-keyword">class</span> <span class="hljs-title c
 
         .volume-control &gt; input[type=range] {
           max-width: calc(
-            5rem * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>) +
-            0rem * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>))
+            5rem * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">1</span>) +
+            0rem * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">1</span>))
           );
           opacity: calc(
-            <span class="hljs-number">1</span> * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>) +
-            <span class="hljs-number">0</span> * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>))
+            <span class="hljs-number">1</span> * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">1</span>) +
+            <span class="hljs-number">0</span> * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">1</span>))
           );;
           padding-left: calc(
-            <span class="hljs-number">0.</span>75rem * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>) +
-            0rem * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">0</span>))
+            <span class="hljs-number">0.</span>75rem * <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">1</span>) +
+            0rem * (<span class="hljs-number">1</span> - <span class="hljs-keyword">var</span>(--x-volume-slider-expand, <span class="hljs-number">1</span>))
           );
         } 
 
@@ -534,14 +539,16 @@ export default <span class="hljs-keyword">class</span> <span class="hljs-title c
       &lt;slot&gt;&lt;/slot&gt;
       &lt;div part=<span class="hljs-string">&quot;controls-panel&quot;</span>&gt;
         &lt;div part=<span class="hljs-string">&quot;control-button play-button&quot;</span>&gt;&lt;/div&gt;
-        &lt;div part=<span class="hljs-string">&quot;volume-control&quot;</span> <span class="hljs-keyword">class</span>=<span class="hljs-string">&quot;volume-control&quot;</span>&gt;
-          &lt;div part=<span class="hljs-string">&quot;control-button mute-button&quot;</span>&gt;&lt;/div&gt;
-          &lt;input part=<span class="hljs-string">&quot;slider volume-slider&quot;</span> type=<span class="hljs-string">&quot;range&quot;</span>/&gt;
-        &lt;/div&gt;
+        
         &lt;input part=<span class="hljs-string">&quot;slider timeline&quot;</span> type=<span class="hljs-string">&quot;range&quot;</span>/&gt;
         &lt;div part=<span class="hljs-string">&quot;time-display&quot;</span>&gt;
           &lt;div part=<span class="hljs-string">&quot;display current-time&quot;</span>&gt;<span class="hljs-number">0</span>:<span class="hljs-number">00</span>&lt;/div&gt;
           &lt;div part=<span class="hljs-string">&quot;display duration&quot;</span>&gt;<span class="hljs-number">0</span>:<span class="hljs-number">00</span>&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div part=<span class="hljs-string">&quot;volume-control&quot;</span> <span class="hljs-keyword">class</span>=<span class="hljs-string">&quot;volume-control&quot;</span>&gt;
+          &lt;div part=<span class="hljs-string">&quot;control-button mute-button&quot;</span>&gt;&lt;/div&gt;
+          &lt;input part=<span class="hljs-string">&quot;slider volume-slider&quot;</span> type=<span class="hljs-string">&quot;range&quot;</span>/&gt;
         &lt;/div&gt;
         
         &lt;div part=<span class="hljs-string">&quot;control-button fullscreen-button&quot;</span>&gt;&lt;/div&gt;

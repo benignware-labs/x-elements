@@ -191,7 +191,7 @@
   <div class="flex-grow">
     <div class="container py-4">
       <h1>Ambience</h1>
-      <p>The Ambience Component creates an atmospheric backdrop on images and video.</p>
+      <p>Creates atmospheric backdrop for images and videos.</p>
 <h2>Example: Image</h2>
 <p>
 
@@ -203,7 +203,7 @@
     <div class="example-body">
       <x-ambience>
   <img
-    src="https://picsum.photos/id/134/800/450"
+    src="https://picsum.photos/id/56/800/450"
     style="aspect-ratio: 16/9; width: 100%; height: auto; "
   />
 </x-ambience>
@@ -216,7 +216,7 @@
 </p>
 <pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
-    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/134/800/450&quot;</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/56/800/450&quot;</span>
     <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
   /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
@@ -231,17 +231,16 @@
 
     <div class="example-body">
       <x-ambience>
-   <video
-    id="video"
+  <video
     style="aspect-ratio: 16/9; width: 100%; height: auto; "
     src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    poster="https://picsum.photos/id/151/800/450"
+    poster="https://picsum.photos/id/352/800/450"
     loop
     muted
     playsinline
     controls
   ></video>
-  </x-ambience>
+</x-ambience>
 
     </div>
   </template>
@@ -250,17 +249,242 @@
   </example-viewer>
 </p>
 <pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
-   <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
-    <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;video&quot;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
     <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
-    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/151/800/450&quot;</span>
+    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/352/800/450&quot;</span>
     <span class="hljs-attr">loop</span>
     <span class="hljs-attr">muted</span>
     <span class="hljs-attr">playsinline</span>
     <span class="hljs-attr">controls</span>
   &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<h2>Example: &quot;for&quot;-Attribute</h2>
+<p>
+
+  <template id="example-8-template">
+    
+
+    
+
+    <div class="example-body">
+      <img
+  id="testimg"
+  src="https://picsum.photos/id/62/800/450"
+  style="aspect-ratio: 16/9; width: 100%; height: auto; "
+/>
+<x-ambience for="testimg"/>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-8-viewer" template="#example-8-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+  <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;testimg&quot;</span>
+  <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/62/800/450&quot;</span>
+  <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
+/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;testimg&quot;</span>/&gt;</span>
+</code></pre>
+<h2>Example: Overflow</h2>
+<p>
+
+  <template id="example-9-template">
+    
+
+    <style>.slider {
+  overflow: hidden;
+}
+
+.slider-layer {
+  display: flex;
+  flex-wrap: nowrap;
+  transition: transform 0.8s ease;
+}
+
+.slide {
+  width: 100%;
+  flex-shrink: 0;
+  max-height: 400px;
+  overflow: auto;
+}
+
+</style><script>(() => {let activeIndex = 0;
+const slider = document.querySelector('#slider');
+
+const layer = slider.querySelector('.slider-layer');
+
+const slideTo = (index) => {
+  activeIndex = index;
+  
+  layer.style.transform = `translateX(calc(-100% * ${activeIndex}))`;
+}
+
+slideTo(0);
+
+slider.addEventListener('click', event => {
+  console.log('click');
+  const next = event.target.closest('.slider-next');
+
+  if (next) {
+    console.log('next');
+    slideTo(activeIndex + 1 > layer.children.length - 1 ? 0 : activeIndex + 1);
+  }
+
+  const prev = event.target.closest('.slider-prev');
+
+  if (prev) {
+    slideTo(activeIndex - 1 < 0 ? layer.children.length - 1 : activeIndex - 1);
+  }
+})
+})()</script>
+
+    <div class="example-body">
+      
+  <div id="slider" class="slider">
+    <div class="slider-layer">
+      <div class="slide">
+        <h2>Slide 1</h2>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <img
+          src="https://picsum.photos/id/134/800/450"
+          style="aspect-ratio: 16/9; width: 100%; height: auto; "
+        />
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+      </div>
+      <div class="slide">
+        <h2>Slide 2</h2>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <img
+          src="https://picsum.photos/id/678/800/450"
+          style="aspect-ratio: 16/9; width: 200px; height: auto; "
+        />
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+      </div>
+      <div class="slide">
+        <h2>Slide 3</h2>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <video
+          style="aspect-ratio: 16/9; width: 100%; height: auto; "
+          src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          poster="https://picsum.photos/id/352/800/450"
+          loop
+          muted
+          playsinline
+          controls
+        ></video>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+      </div>
+    </div>
+    <button class="slider-next">Next</button>
+    <button class="slider-prev">Prev</button>
+  </div>
+  <x-ambience for="slider"/>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-9-viewer" template="#example-9-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-selector-class">.slider</span> {
+  <span class="hljs-attribute">overflow</span>: hidden;
+}
+
+<span class="hljs-selector-class">.slider-layer</span> {
+  <span class="hljs-attribute">display</span>: flex;
+  <span class="hljs-attribute">flex-wrap</span>: nowrap;
+  <span class="hljs-attribute">transition</span>: transform <span class="hljs-number">0.8s</span> ease;
+}
+
+<span class="hljs-selector-class">.slide</span> {
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">flex-shrink</span>: <span class="hljs-number">0</span>;
+  <span class="hljs-attribute">max-height</span>: <span class="hljs-number">400px</span>;
+  <span class="hljs-attribute">overflow</span>: auto;
+}
+
+</code></pre>
+<pre><code class="hljs"><span class="hljs-keyword">let</span> activeIndex = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">const</span> slider = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#slider&#x27;</span>);
+
+<span class="hljs-keyword">const</span> layer = slider.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;.slider-layer&#x27;</span>);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">slideTo</span> = (<span class="hljs-params">index</span>) =&gt; {
+  activeIndex = index;
+  
+  layer.<span class="hljs-property">style</span>.<span class="hljs-property">transform</span> = <span class="hljs-string">`translateX(calc(-100% * <span class="hljs-subst">${activeIndex}</span>))`</span>;
+}
+
+<span class="hljs-title function_">slideTo</span>(<span class="hljs-number">0</span>);
+
+slider.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function"><span class="hljs-params">event</span> =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;click&#x27;</span>);
+  <span class="hljs-keyword">const</span> next = event.<span class="hljs-property">target</span>.<span class="hljs-title function_">closest</span>(<span class="hljs-string">&#x27;.slider-next&#x27;</span>);
+
+  <span class="hljs-keyword">if</span> (next) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;next&#x27;</span>);
+    <span class="hljs-title function_">slideTo</span>(activeIndex + <span class="hljs-number">1</span> &gt; layer.<span class="hljs-property">children</span>.<span class="hljs-property">length</span> - <span class="hljs-number">1</span> ? <span class="hljs-number">0</span> : activeIndex + <span class="hljs-number">1</span>);
+  }
+
+  <span class="hljs-keyword">const</span> prev = event.<span class="hljs-property">target</span>.<span class="hljs-title function_">closest</span>(<span class="hljs-string">&#x27;.slider-prev&#x27;</span>);
+
+  <span class="hljs-keyword">if</span> (prev) {
+    <span class="hljs-title function_">slideTo</span>(activeIndex - <span class="hljs-number">1</span> &lt; <span class="hljs-number">0</span> ? layer.<span class="hljs-property">children</span>.<span class="hljs-property">length</span> - <span class="hljs-number">1</span> : activeIndex - <span class="hljs-number">1</span>);
+  }
+})
+</code></pre>
+<pre><code class="hljs">
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;slider&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-layer&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slide&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Slide 1<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+          <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/134/800/450&quot;</span>
+          <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
+        /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slide&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Slide 2<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+          <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/678/800/450&quot;</span>
+          <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 200px; height: auto; &quot;</span>
+        /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slide&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Slide 3<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+          <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
+          <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+          <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/352/800/450&quot;</span>
+          <span class="hljs-attr">loop</span>
+          <span class="hljs-attr">muted</span>
+          <span class="hljs-attr">playsinline</span>
+          <span class="hljs-attr">controls</span>
+        &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-next&quot;</span>&gt;</span>Next<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-prev&quot;</span>&gt;</span>Prev<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;slider&quot;</span>/&gt;</span>
 </code></pre>
 
     </div>

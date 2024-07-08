@@ -638,166 +638,274 @@ var PanelManager = class {
 };
 
 // lib/Ambience/Ambience.mjs
-var Ambience = class _Ambience extends HTMLElement {
-  #poster;
-  #slot;
+var MEDIA_TAGS = ["IMG", "VIDEO"];
+var Ambience = class extends HTMLElement {
+  #assignedChildren;
+  #mutationObservers;
+  #mediaElements;
+  #displayElements;
   #backdrop;
-  #canvas;
-  #mediaElement;
-  static MEDIA_CLASSES = [HTMLImageElement, HTMLVideoElement];
+  #backdropBody;
+  static observedAttributes = ["for"];
   constructor() {
     super();
-    this.handleResize = this.handleResize.bind(this);
+    this.handleMutation = this.handleMutation.bind(this);
     this.handleSlotChange = this.handleSlotChange.bind(this);
-    this.update = this.update.bind(this);
+    this.handleResize = this.handleResize.bind(this);
+    this.handleLoad = this.handleLoad.bind(this);
     this.attachShadow({ mode: "open" });
     this.shadowRoot.innerHTML = `
       <style>
+        /* Add your styling here */
         :host {
-          display: inline-block;
+          display: contents;
           position: relative;
+          transform-style: preserve-3d;
+           
+        }
+
+        slot {
+          display: block;
+          transform-style: preserve-3d;
         }
 
         :host::part(backdrop) {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          position: relative;
           z-index: -1;
-          filter: contrast(2) blur(3.5rem) opacity(0.5) brightness(2.7);
+          transform : translate3d ( 0,0,0 ) ;
+          transform-style: preserve-3d;
+          
+          /*filter: contrast(2) blur(3.5rem) opacity(0.5) brightness(2.7);*/
+          filter: blur(3.5rem);
+          /*pointer-events: none;*/
+          transform: translate3d(0, 0, 0);
+        }
+        
+        :host::part(backdrop-body) {
+          transform: translate3d(0, 0, 0);
+          transform-style: preserve-3d;
         }
 
-        :host::part(poster) {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          outline: 2px solid red;
-        }
-
-        canvas {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-        }
+        /*:host::part(body) {
+          position: relative;
+          overflow: auto;
+          height: 300px;
+        }*/
       </style>
-      
-     
-      <div part="backdrop">
-        <canvas part="canvas"></canvas>
+      <div part="body">
+        <div part="backdrop">
+          <div part="backdrop-body"></div>
+        </div>
+        <div part="content">
+          <slot></slot>
+        </div>
       </div>
-      
-      <slot></slot>
     `;
-    this.#slot = this.shadowRoot.querySelector("slot");
-    this.#poster = this.shadowRoot.querySelector('[part="poster"]');
-    this.#canvas = this.shadowRoot.querySelector('[part="canvas"]');
     this.#backdrop = this.shadowRoot.querySelector('[part="backdrop"]');
+    this.#backdropBody = this.shadowRoot.querySelector('[part="backdrop-body"]');
+    this.#assignedChildren = /* @__PURE__ */ new Set();
+    this.#mediaElements = /* @__PURE__ */ new Set();
+    this.#displayElements = /* @__PURE__ */ new WeakMap();
+    this.#mutationObservers = /* @__PURE__ */ new WeakMap();
+  }
+  handleMutation(mutations) {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.filter((node) => node.nodeType === 1 && MEDIA_TAGS.includes(node.nodeName)).forEach((node) => this.mediaElementAdded(node));
+      mutation.removedNodes.filter((node) => node.nodeType === 1 && MEDIA_TAGS.includes(node.nodeName)).forEach((node) => this.mediaElementRemoved(node));
+    });
+  }
+  createDisplayElement(element) {
+    let displayElement2;
+    if (element instanceof HTMLMediaElement) {
+      const canvas = document.createElement("canvas");
+      const poster = document.createElement("img");
+      poster.src = element.poster;
+      poster.style.width = "100%";
+      poster.style.height = "100%";
+      poster.style.position = "absolute";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.position = "absolute";
+      displayElement2 = document.createElement("div");
+      displayElement2.appendChild(canvas);
+      displayElement2.appendChild(poster);
+    }
+    if (!displayElement2) {
+      displayElement2 = element.cloneNode(true);
+    }
+    displayElement2.style.transition = "opacity 0.12s";
+    return displayElement2;
+  }
+  mediaElementAdded(...element) {
+    element.forEach((element2) => {
+      this.#mediaElements.add(element2);
+      const displayElement2 = this.createDisplayElement(element2);
+      this.#backdropBody.appendChild(displayElement2);
+      this.#displayElements.set(element2, displayElement2);
+      element2.addEventListener("load", this.handleLoad);
+    });
+    this.render();
+  }
+  mediaElementRemoved(...element) {
+    element.forEach((element2) => {
+      this.#mediaElements.delete(element2);
+      this.#backdropBody.removeChild(displayElement);
+      this.#displayElements.delete(element2);
+      element2.removeEventListener("load", this.handleLoad);
+    });
+    this.render();
+  }
+  addTargetElement(...elements) {
+    elements.filter((element) => !this.#assignedChildren.has(element)).forEach((element) => {
+      this.#assignedChildren.add(element);
+      const mutationObserver = new MutationObserver(this.handleMutation);
+      mutationObserver.observe(element, {
+        childList: true,
+        subtree: true
+      });
+      this.#mutationObservers.set(element, mutationObserver);
+      const nodes = [...element.querySelectorAll(MEDIA_TAGS.join(", "))];
+      if (MEDIA_TAGS.includes(element.nodeName)) {
+        nodes.push(element);
+      }
+      this.mediaElementAdded(...nodes);
+    });
+  }
+  removeTargetElement(...elements) {
+    elements.filter((element) => this.#assignedChildren.has(element)).forEach((element) => {
+      const mutationObserver = this.#mutationObservers.get(element);
+      mutationObserver.disconnect();
+      this.#mutationObservers.delete(element);
+      this.#assignedChildren.delete(element);
+      if (MEDIA_TAGS.includes(element.nodeName)) {
+        this.mediaElementRemoved(element);
+      }
+    });
+  }
+  handleSlotChange(e) {
+    if (this.hasAttribute("for")) {
+      return;
+    }
+    const slot = e.target;
+    const assignedElements = [...this.#assignedChildren];
+    const removedNodes = assignedElements.filter((x) => !slot.assignedElements().includes(x));
+    const addedNodes = slot.assignedElements().filter((x) => !assignedElements.includes(x));
+    this.addTargetElement(...addedNodes);
+    this.removeTargetElement(...removedNodes);
   }
   handleResize() {
-    this.update();
+    this.render();
   }
-  handleSlotChange(event) {
-    const mediaElement = event.target.assignedElements().find((element) => _Ambience.MEDIA_CLASSES.includes(element.constructor));
-    if (mediaElement !== this.#mediaElement) {
-      if (this.#mediaElement) {
-      }
-      this.#mediaElement = mediaElement;
-      if (this.#mediaElement) {
-      }
-    }
-    this.update();
+  handleLoad(event) {
+    console.log("handleLoad", event.target.src);
+    window.requestAnimationFrame(() => {
+      this.render();
+    });
   }
   connectedCallback() {
+    const slot = this.shadowRoot.querySelector("slot");
+    slot.addEventListener("slotchange", this.handleSlotChange);
     window.addEventListener("resize", this.handleResize);
-    this.#slot.addEventListener("slotchange", this.handleSlotChange);
-    this.update();
   }
   detachedCallback() {
     window.removeEventListener("resize", this.handleResize);
   }
-  update() {
-    requestAnimationFrame(() => this.update());
-    if (!this.targetElement) {
-      return;
-    }
-    const t = this.targetElement;
-    const offset = 0;
-    const style = getComputedStyle(t);
-    const objectFit = style.objectFit;
-    const borderRadius = style.borderRadius;
-    this.#canvas.style.transform = "";
-    const ctx = this.#canvas.getContext("2d");
-    const v = this.targetElement;
-    const isPoster = this.targetElement.poster && !this.targetElement.played.length;
-    if (isPoster) {
-      this.#backdrop.style.background = `url(${this.targetElement.poster}) no-repeat center center / cover`;
-      return;
-    }
-    const f = 1 + offset / 100;
-    const b = this.targetElement.getBoundingClientRect();
-    const w = b.width;
-    const h = b.height;
-    this.#canvas.width = w;
-    this.#canvas.height = h;
-    const sx = 0;
-    const sy = 0;
-    const sw = v.videoWidth || v.offsetWidth;
-    const sh = v.videoHeight || v.offsetHeight;
-    var hRatio = w / sw;
-    var vRatio = h / sh;
-    var ratio = objectFit === "cover" ? Math.max(hRatio, vRatio) : Math.min(hRatio, vRatio);
-    const dx = (w - sw * ratio / f) / 2;
-    const dy = (h - sh * ratio / f) / 2;
-    const dw = sw * ratio / f;
-    const dh = sh * ratio / f;
-    ctx.clearRect(0, 0, w, h);
-    const [, borderTopLeftValue, borderTopLeftUnit] = style.borderTopLeftRadius.match(/(\d+)(px|%)/);
-    const borderTopLeftRadius = borderTopLeftUnit === "px" ? borderTopLeftValue : borderTopLeftValue * w / 100;
-    const [, borderTopRightValue, borderTopRightUnit] = style.borderTopRightRadius.match(/(\d+)(px|%)/);
-    const borderTopRightRadius = borderTopRightUnit === "px" ? borderTopRightValue : borderTopRightValue * w / 100;
-    const [, borderBottomLeftValue, borderBottomLeftUnit] = style.borderBottomLeftRadius.match(/(\d+)(px|%)/);
-    const borderBottomLeftRadius = borderBottomLeftUnit === "px" ? borderBottomLeftValue : borderBottomLeftValue * w / 100;
-    const [, borderBottomRightValue, borderBottomRightUnit] = style.borderBottomRightRadius.match(/(\d+)(px|%)/);
-    const borderBottomRightRadius = borderBottomRightUnit === "px" ? borderBottomRightValue : borderBottomRightValue * w / 100;
-    const tlr = borderTopLeftRadius;
-    const trr = borderTopRightRadius;
-    const blr = borderBottomLeftRadius;
-    const brr = borderBottomRightRadius;
-    ctx.strokeStyle = "transparent";
-    ctx.beginPath();
-    ctx.roundRect(dx, dy, dw, dh, [tlr, trr, blr, brr]);
-    ctx.stroke();
-    ctx.clip();
-    ctx.drawImage(
-      v,
-      sx,
-      sy,
-      sw,
-      sh,
-      dx,
-      dy,
-      dw,
-      dh
-    );
+  get clipArea() {
+    let bounds = [...this.#assignedChildren].reduce((bounds2, element) => {
+      const elementBounds = element.getBoundingClientRect();
+      bounds2.top = Math.min(bounds2.top, elementBounds.top);
+      bounds2.left = Math.min(bounds2.left, elementBounds.left);
+      bounds2.bottom = Math.max(bounds2.bottom, elementBounds.bottom);
+      bounds2.right = Math.max(bounds2.right, elementBounds.right);
+      return bounds2;
+    }, {
+      top: Infinity,
+      left: Infinity,
+      bottom: -Infinity,
+      right: -Infinity
+    });
+    bounds = {
+      top: Math.round(bounds.top),
+      left: Math.round(bounds.left),
+      width: Math.round(bounds.right - bounds.left),
+      height: Math.round(bounds.bottom - bounds.top),
+      right: Math.round(bounds.right),
+      bottom: Math.round(bounds.bottom)
+    };
+    const targetBounds = this.#backdrop.getBoundingClientRect();
+    bounds.top -= targetBounds.top;
+    bounds.left -= targetBounds.left;
+    bounds.bottom -= targetBounds.top;
+    bounds.right -= targetBounds.left;
+    return bounds;
   }
-  get targetElement() {
-    const target = this.dataset.target;
-    if (target) {
-      return document.querySelector(target);
+  render() {
+    const bounds = this.getBoundingClientRect();
+    const backdrop = this.#backdrop;
+    const targetBounds = backdrop.getBoundingClientRect();
+    if (this.#mediaElements.size === 0) {
+      return;
     }
-    const element = this.querySelector("img, video");
-    return element;
+    for (const element of this.#mediaElements) {
+      const style = window.getComputedStyle(element);
+      const copyStyles = ["filter", "transition", "visibility"];
+      let elementBounds = element.getBoundingClientRect();
+      const top = elementBounds.top - targetBounds.top;
+      const left = elementBounds.left - targetBounds.left;
+      const displayElement2 = this.#displayElements.get(element);
+      displayElement2.style.display = "block";
+      displayElement2.style.marginLeft = "0";
+      displayElement2.style.marginTop = "0";
+      displayElement2.style.margin = "0";
+      displayElement2.style.position = "absolute";
+      copyStyles.forEach((name) => {
+        displayElement2.style[name] = style[name];
+      });
+      if (elementBounds.width > 0 && elementBounds.height > 0) {
+        displayElement2.style.transform = `translate(${left}px, ${top}px)`;
+        displayElement2.style.width = `${elementBounds.width}px`;
+        displayElement2.style.height = `${elementBounds.height}px`;
+        displayElement2.style.opacity = 1;
+      } else {
+        displayElement2.style.opacity = 0;
+      }
+      if (element instanceof HTMLMediaElement) {
+        const canvas = displayElement2.querySelector("canvas");
+        const poster = displayElement2.querySelector("img");
+        const isPoster = element.poster && element.played.length === 0;
+        poster.style.display = isPoster ? "block" : "none";
+        if (!isPoster) {
+          canvas.width = elementBounds.width;
+          canvas.height = elementBounds.height;
+          const context = canvas.getContext("2d");
+          context.drawImage(element, 0, 0, canvas.width, canvas.height);
+        }
+      }
+    }
+    const clipArea = this.clipArea;
+    const clipPath = `polygon(${clipArea.left}px ${clipArea.top}px,${clipArea.right}px ${clipArea.top}px,${clipArea.right}px ${clipArea.bottom}px,${clipArea.left}px ${clipArea.bottom}px)`;
+    this.#backdropBody.style.clipPath = clipPath;
+    window.requestAnimationFrame(() => {
+      this.render();
+    });
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) {
+      return;
+    }
+    if (name === "for") {
+      const targetElement = document.querySelector(`#${newValue}`);
+      if (targetElement) {
+        this.removeTargetElement(targetElement);
+        this.addTargetElement(targetElement);
+      }
+    }
   }
 };
-customElements.define("x-ambience", Ambience);
+if (!customElements.get("x-ambience")) {
+  customElements.define("x-ambience", Ambience);
+}
+var Ambience_default = Ambience;
 
 // lib/MediaControls/MediaControls.mjs
 var formatCurrentTime = (time, duration) => {
@@ -890,7 +998,12 @@ var MediaControls = class _MediaControls extends HTMLElement {
           width: max-content;
           flex-grow: 1;
           flex-shrink: 1;
+        }
+
+        :host::part(timeline) {
           min-width: 65px;
+          flex-grow: 1;
+          flex-shrink: 1;
         }
 
         ${[
@@ -1095,16 +1208,16 @@ var MediaControls = class _MediaControls extends HTMLElement {
 
         .volume-control > input[type=range] {
           max-width: calc(
-            5rem * var(--x-volume-slider-expand, 0) +
-            0rem * (1 - var(--x-volume-slider-expand, 0))
+            5rem * var(--x-volume-slider-expand, 1) +
+            0rem * (1 - var(--x-volume-slider-expand, 1))
           );
           opacity: calc(
-            1 * var(--x-volume-slider-expand, 0) +
-            0 * (1 - var(--x-volume-slider-expand, 0))
+            1 * var(--x-volume-slider-expand, 1) +
+            0 * (1 - var(--x-volume-slider-expand, 1))
           );;
           padding-left: calc(
-            0.75rem * var(--x-volume-slider-expand, 0) +
-            0rem * (1 - var(--x-volume-slider-expand, 0))
+            0.75rem * var(--x-volume-slider-expand, 1) +
+            0rem * (1 - var(--x-volume-slider-expand, 1))
           );
         } 
 
@@ -1127,14 +1240,16 @@ var MediaControls = class _MediaControls extends HTMLElement {
       <slot></slot>
       <div part="controls-panel">
         <div part="control-button play-button"></div>
-        <div part="volume-control" class="volume-control">
-          <div part="control-button mute-button"></div>
-          <input part="slider volume-slider" type="range"/>
-        </div>
+        
         <input part="slider timeline" type="range"/>
         <div part="time-display">
           <div part="display current-time">0:00</div>
           <div part="display duration">0:00</div>
+        </div>
+
+        <div part="volume-control" class="volume-control">
+          <div part="control-button mute-button"></div>
+          <input part="slider volume-slider" type="range"/>
         </div>
         
         <div part="control-button fullscreen-button"></div>
@@ -1362,7 +1477,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
 };
 customElements.define("x-media-controls", MediaControls);
 export {
-  Ambience,
+  Ambience_default as Ambience,
   MediaControls,
   XOption as Option,
   Panel_default as Panel,
