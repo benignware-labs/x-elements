@@ -18,6 +18,7 @@ Creates atmospheric backdrop for images and videos.
 </x-ambience>
 ```
 
+
 ## Example: Video
 
 <!-- Example -->
@@ -35,6 +36,7 @@ Creates atmospheric backdrop for images and videos.
 </x-ambience>
 ```
 
+
 ## Example: "for"-Attribute
 
 <!-- Example -->
@@ -46,6 +48,7 @@ Creates atmospheric backdrop for images and videos.
 />
 <x-ambience for="testimg"/>
 ```
+
 
 ## Example: Overflow
 
@@ -147,4 +150,49 @@ slider.addEventListener('click', event => {
     <button class="slider-prev">Prev</button>
   </div>
   <x-ambience for="slider"/>
+```
+
+
+## Example: Nested
+
+<!-- Example -->
+```html
+<x-ambience>
+  <img
+    src="https://picsum.photos/id/256/800/450"
+    style="aspect-ratio: 16/9; width: 100%; height: auto; "
+  />
+  <div>
+    <x-ambience>
+      <h4>Nested Ambience</h4>
+      <img
+        src="https://picsum.photos/id/526/800/450"
+        style="aspect-ratio: 16/9; width: 100%; height: auto; "
+      />
+    </x-ambience>
+    <h4>Nested Ambience with "for"-Attribute</h4>
+    <img
+      id="nested-img"
+       src="https://picsum.photos/id/56/800/450"
+      style="aspect-ratio: 16/9; width: 100%; height: auto; "
+    />
+    <x-ambience for="nested-img" />
+  </div>
+</x-ambience>
+```
+
+
+
+## Example: Clip to scroll parent
+<!-- Example -->
+
+```html
+<x-ambience style="--x-ambience-filter: blur(4rem)">
+ <div style="width: 100%; height: 300px; overflow: auto;">
+    <img
+      src="https://picsum.photos/id/56/800/450"
+      style="aspect-ratio: 16/9; width: 3000px; height: auto; "
+    />
+  </div>
+</x-ambience>
 ```
