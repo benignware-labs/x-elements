@@ -188,7 +188,7 @@
   
 </ul>
 </div>
-  <div class="flex-grow">
+  <div class="flex-grow content">
     <div class="container py-4">
       <h1>Ambience</h1>
       <p>Creates atmospheric backdrop for images and videos.</p>
@@ -234,7 +234,7 @@
   <video
     style="aspect-ratio: 16/9; width: 100%; height: auto; "
     src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    poster="https://picsum.photos/id/352/800/450"
+    poster="https://picsum.photos/id/888/800/450"
     loop
     muted
     playsinline
@@ -252,7 +252,7 @@
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
     <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
-    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/352/800/450&quot;</span>
+    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/888/800/450&quot;</span>
     <span class="hljs-attr">loop</span>
     <span class="hljs-attr">muted</span>
     <span class="hljs-attr">playsinline</span>
@@ -289,10 +289,169 @@
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;testimg&quot;</span>/&gt;</span>
 </code></pre>
-<h2>Example: Overflow</h2>
+<h2>Example: States and Transitions</h2>
 <p>
 
   <template id="example-9-template">
+    
+
+    <style>.img {
+  aspect-ratio: 16/9;
+  width: 100%;
+  height: auto;
+  filter: grayscale(100%);
+  transform: scale(0.75);
+  transition: all 0.2s ease-in;
+}
+
+.img:hover {
+  transform: scale(1);
+}
+
+.img.active {
+  filter: grayscale(0);
+}
+</style>
+
+    <div class="example-body">
+      <x-ambience>
+  <img
+    src="https://picsum.photos/id/56/800/450"
+    class="img"
+    onclick="this.classList.toggle('active')"
+  />
+</x-ambience>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-9-viewer" template="#example-9-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/56/800/450&quot;</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;img&quot;</span>
+    <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.classList.toggle(&#x27;active&#x27;)&quot;</span>
+  /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-selector-class">.img</span> {
+  aspect-ratio: <span class="hljs-number">16</span>/<span class="hljs-number">9</span>;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">height</span>: auto;
+  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">grayscale</span>(<span class="hljs-number">100%</span>);
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">scale</span>(<span class="hljs-number">0.75</span>);
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease-in;
+}
+
+<span class="hljs-selector-class">.img</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">scale</span>(<span class="hljs-number">1</span>);
+}
+
+<span class="hljs-selector-class">.img</span><span class="hljs-selector-class">.active</span> {
+  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">grayscale</span>(<span class="hljs-number">0</span>);
+}
+</code></pre>
+<h2>Example: Clip</h2>
+<p>
+
+  <template id="example-10-template">
+    
+
+    
+
+    <div class="example-body">
+      <x-ambience style="--x-ambience-filter: blur(4rem)">
+ <div style="width: 100%; height: 300px; overflow: auto;">
+    <img
+      src="https://picsum.photos/id/56/800/450"
+      style="aspect-ratio: 16/9; width: 3000px; height: auto; "
+    />
+  </div>
+</x-ambience>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-10-viewer" template="#example-10-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;--x-ambience-filter: blur(4rem)&quot;</span>&gt;</span>
+ <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: 300px; overflow: auto;&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+      <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/56/800/450&quot;</span>
+      <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 3000px; height: auto; &quot;</span>
+    /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<h2>Example: Nested Clip</h2>
+<p>
+
+  <template id="example-11-template">
+    
+
+    <style>.overflow {
+  overflow: auto;
+  width: 100%;
+  height: 300px
+}
+
+</style>
+
+    <div class="example-body">
+      <x-ambience>
+  <div class="overflow root">
+    <h4>Image 1</h4>
+    <img
+        src="https://picsum.photos/id/456/800/450"
+        style="aspect-ratio: 16/9; width: 900px; height: auto; "
+      />
+    <div class="overflow container">
+      <h4>Image 2</h4>
+      <img
+        src="https://picsum.photos/id/643/800/450"
+        style="aspect-ratio: 16/9; width: 1600px; height: auto; "
+      />
+    </div>
+  </div>
+</x-ambience>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-11-viewer" template="#example-11-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;overflow root&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Image 1<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+        <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/456/800/450&quot;</span>
+        <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 900px; height: auto; &quot;</span>
+      /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;overflow container&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h4</span>&gt;</span>Image 2<span class="hljs-tag">&lt;/<span class="hljs-name">h4</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+        <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/643/800/450&quot;</span>
+        <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 1600px; height: auto; &quot;</span>
+      /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-selector-class">.overflow</span> {
+  <span class="hljs-attribute">overflow</span>: auto;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">300px</span>
+}
+
+</code></pre>
+<h2>Example: Slider</h2>
+<p>
+
+  <template id="example-12-template">
     
 
     <style>.slider {
@@ -311,7 +470,6 @@
   max-height: 400px;
   overflow: auto;
 }
-
 </style><script>(() => {let activeIndex = 0;
 const slider = document.querySelector('#slider');
 
@@ -343,7 +501,7 @@ slider.addEventListener('click', event => {
 })()</script>
 
     <div class="example-body">
-      
+      <x-ambience>
   <div id="slider" class="slider">
     <div class="slider-layer">
       <div class="slide">
@@ -361,8 +519,8 @@ slider.addEventListener('click', event => {
         <h2>Slide 2</h2>
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <img
-          src="https://picsum.photos/id/678/800/450"
-          style="aspect-ratio: 16/9; width: 200px; height: auto; "
+          src="https://picsum.photos/id/445/800/450"
+          style="aspect-ratio: 16/9; width: 400px; height: auto; "
         />
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
       </div>
@@ -373,7 +531,7 @@ slider.addEventListener('click', event => {
         <video
           style="aspect-ratio: 16/9; width: 100%; height: auto; "
           src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          poster="https://picsum.photos/id/352/800/450"
+          poster="https://picsum.photos/id/621/800/450"
           loop
           muted
           playsinline
@@ -386,11 +544,11 @@ slider.addEventListener('click', event => {
     <button class="slider-next">Next</button>
     <button class="slider-prev">Prev</button>
   </div>
-  <x-ambience for="slider"/>
+</x-ambience>
 
     </div>
   </template>
-  <example-viewer class="example" id="example-9-viewer" template="#example-9-template">
+  <example-viewer class="example" id="example-12-viewer" template="#example-12-template">
 
   </example-viewer>
 </p>
@@ -410,7 +568,6 @@ slider.addEventListener('click', event => {
   <span class="hljs-attribute">max-height</span>: <span class="hljs-number">400px</span>;
   <span class="hljs-attribute">overflow</span>: auto;
 }
-
 </code></pre>
 <pre><code class="hljs"><span class="hljs-keyword">let</span> activeIndex = <span class="hljs-number">0</span>;
 <span class="hljs-keyword">const</span> slider = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#slider&#x27;</span>);
@@ -441,7 +598,7 @@ slider.<span class="hljs-title function_">addEventListener</span>(<span class="h
   }
 })
 </code></pre>
-<pre><code class="hljs">
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;slider&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider&quot;</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-layer&quot;</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slide&quot;</span>&gt;</span>
@@ -459,8 +616,8 @@ slider.<span class="hljs-title function_">addEventListener</span>(<span class="h
         <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Slide 2<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
-          <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/678/800/450&quot;</span>
-          <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 200px; height: auto; &quot;</span>
+          <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/445/800/450&quot;</span>
+          <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 400px; height: auto; &quot;</span>
         /&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
@@ -471,7 +628,7 @@ slider.<span class="hljs-title function_">addEventListener</span>(<span class="h
         <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
           <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: auto; &quot;</span>
           <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
-          <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/352/800/450&quot;</span>
+          <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/621/800/450&quot;</span>
           <span class="hljs-attr">loop</span>
           <span class="hljs-attr">muted</span>
           <span class="hljs-attr">playsinline</span>
@@ -484,7 +641,7 @@ slider.<span class="hljs-title function_">addEventListener</span>(<span class="h
     <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-next&quot;</span>&gt;</span>Next<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-prev&quot;</span>&gt;</span>Prev<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;slider&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
 </code></pre>
 
     </div>

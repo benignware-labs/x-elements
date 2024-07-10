@@ -111,12 +111,16 @@
       style.textContent = `
         :host {
           display: block;
+          width: 100%;
           height: auto !important;
+          /*overflow: auto;*/
+          overflow: visible;
         }
 
         :host > .example-body {
           min-height: 0 !important;
           display: block !important;
+          width: 100% !important;
         }
       `;
 

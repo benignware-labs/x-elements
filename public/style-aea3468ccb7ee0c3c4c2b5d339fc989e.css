@@ -4,6 +4,10 @@
   --spacer-y: 1rem;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   min-height: 100%;
 }
@@ -75,6 +79,10 @@ body {
   top: 0;
   max-height: 100vh;
   overflow: auto;
+}
+
+.content {
+  max-width: calc(100% - 320px + 1.4rem * 2);
 }
 
 .sidebar-left {

@@ -639,83 +639,224 @@ var PanelManager = class {
 
 // lib/Ambience/Ambience.mjs
 var MEDIA_TAGS = ["IMG", "VIDEO"];
+function copyStyles(dest, src) {
+  const srcStyle = window.getComputedStyle(src);
+  const destStyle = window.getComputedStyle(dest);
+  for (const property in srcStyle) {
+    const fresh = srcStyle.getPropertyValue(property);
+    const current = destStyle.getPropertyValue(property);
+    if (fresh !== current) {
+      return dest.style.setProperty(property, fresh);
+    }
+  }
+}
+var getScrollParent = (element, stop = null, values = ["scroll", "auto"]) => {
+  let parent = element;
+  while (parent) {
+    if (parent === document.body) {
+      return parent;
+    }
+    if (parent === stop) {
+      return null;
+    }
+    const style = window.getComputedStyle(parent);
+    if (values.includes(style.overflow) || values.includes(style.overflowX) || values.includes(style.overflowY)) {
+      return parent;
+    } else {
+      parent = parent.parentElement;
+    }
+  }
+  return document.body;
+};
+var getScrollParents = (element, stop = null, values = ["scroll", "auto"]) => {
+  let parent = element;
+  const parents = [];
+  while (parent) {
+    if (parent === document.body) {
+      return parents;
+    }
+    if (parent === stop) {
+      return parents;
+    }
+    const style = window.getComputedStyle(parent);
+    if (values.includes(style.overflow) || values.includes(style.overflowX) || values.includes(style.overflowY)) {
+      parents.push(parent);
+    }
+    parent = parent.parentElement;
+  }
+  return parents;
+};
+var getPositioonFixedParent = (element) => {
+  let parent = element;
+  while (parent) {
+    const style = window.getComputedStyle(parent);
+    if (style.position === "fixed") {
+      return parent;
+    } else {
+      parent = parent.parentElement;
+    }
+  }
+  return null;
+};
 var Ambience = class extends HTMLElement {
-  #assignedChildren;
-  #mutationObservers;
-  #mediaElements;
-  #displayElements;
+  #internals;
+  #slot;
+  #assignedChildren = /* @__PURE__ */ new Set();
+  #mutationObservers = /* @__PURE__ */ new WeakMap();
+  #mediaElements = /* @__PURE__ */ new Set();
+  #clippingTargets = /* @__PURE__ */ new Set();
+  #clippingParents = /* @__PURE__ */ new WeakMap();
+  #clippingDisplayElements = /* @__PURE__ */ new WeakMap();
+  #displayElements = /* @__PURE__ */ new WeakMap();
+  #displayMediaElements = /* @__PURE__ */ new WeakMap();
+  #displayIds = /* @__PURE__ */ new WeakMap();
+  #displayIdInc = 0;
+  #animatedElements = /* @__PURE__ */ new Set();
+  #elementAnimations = /* @__PURE__ */ new WeakMap();
+  #scrollParent = null;
   #backdrop;
-  #backdropBody;
-  static observedAttributes = ["for"];
+  // Props
+  #animated = false;
+  #for = null;
+  static observedAttributes = ["for", "animated"];
   constructor() {
     super();
     this.handleMutation = this.handleMutation.bind(this);
     this.handleSlotChange = this.handleSlotChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.handleLoad = this.handleLoad.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
+    this.handlePlay = this.handlePlay.bind(this);
+    this.handlePause = this.handlePause.bind(this);
+    this.handleStateChange = this.handleStateChange.bind(this);
+    this.#internals = this.attachInternals();
     this.attachShadow({ mode: "open" });
     this.shadowRoot.innerHTML = `
       <style>
         /* Add your styling here */
         :host {
           display: contents;
-          position: relative;
-          transform-style: preserve-3d;
-           
-        }
-
-        slot {
-          display: block;
-          transform-style: preserve-3d;
+          --x-ambience-filter--default: contrast(1.3) blur(3.5rem) brightness(1.4);
+          /*--x-ambience-filter--default: contrast(4) blur(3.5rem) brightness(2.7);*/
         }
 
         :host::part(backdrop) {
-          position: relative;
-          z-index: -1;
-          transform : translate3d ( 0,0,0 ) ;
+          position: absolute;
           transform-style: preserve-3d;
-          
-          /*filter: contrast(2) blur(3.5rem) opacity(0.5) brightness(2.7);*/
-          filter: blur(3.5rem);
-          /*pointer-events: none;*/
-          transform: translate3d(0, 0, 0);
-        }
-        
-        :host::part(backdrop-body) {
-          transform: translate3d(0, 0, 0);
-          transform-style: preserve-3d;
+          pointer-events: none;
         }
 
-        /*:host::part(body) {
-          position: relative;
-          overflow: auto;
-          height: 300px;
+        :host(:state(--clip))::part(backdrop) {
+          filter: var(--x-ambience-filter, blur(3.5rem));
+          overflow: hidden;
+        }
+
+        :host-context(html.x-ambience-scroll-measure)::part(backdrop) {
+          display: none;
+        }
+
+         /*:host::part(backdrop):after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 1000;
         }*/
+        
+        :host::part(backdrop-body) {
+          position: absolute;
+          transform: translate3d(0, 0, 0);
+          transform-style: preserve-3d;
+          width: 0;
+          height: 0;
+        }
+
+        * {
+          transform-style: preserve-3d;
+          backface-visibility: hidden;
+        }
+
+        :host::part(clip) {
+          position: absolute;
+          overflow: hidden;
+          
+        }
+
+         :host::part(clip) {
+            filter: var(--x-ambience-filter, var(--x-ambience-filter--default));
+         }
+
+        
+         :host::part(display) {
+         position: absolute;
+          filter: var(--x-ambience-filter, var(--x-ambience-filter--default));
+          opacity: 0;
+          transition: opacity 0.125s;
+          will-change: opacity;
+        }
+
+        :host::part(display ready) {
+          opacity: 1;
+        }
+
+         :host::part(clip) :host::part(display),
+         :host::part(clip) :host::part(clip) {
+          filter: none;
+        }
+
+        :host::part(body) {
+          position: relative;
+          transform: translate3d(0, 0, 0);
+        }
       </style>
-      <div part="body">
-        <div part="backdrop">
-          <div part="backdrop-body"></div>
-        </div>
-        <div part="content">
-          <slot></slot>
-        </div>
-      </div>
+      <div part="backdrop"></div>
+      <slot></slot>
     `;
     this.#backdrop = this.shadowRoot.querySelector('[part="backdrop"]');
-    this.#backdropBody = this.shadowRoot.querySelector('[part="backdrop-body"]');
-    this.#assignedChildren = /* @__PURE__ */ new Set();
-    this.#mediaElements = /* @__PURE__ */ new Set();
-    this.#displayElements = /* @__PURE__ */ new WeakMap();
-    this.#mutationObservers = /* @__PURE__ */ new WeakMap();
+    this.#slot = this.shadowRoot.querySelector("slot");
+  }
+  isMediaElement(element) {
+    const isMediaTag = MEDIA_TAGS.includes(element.nodeName);
+    if (!isMediaTag) {
+      return false;
+    }
+    const parentAmbience = element.closest("x-ambience");
+    if (parentAmbience && parentAmbience !== this) {
+      return false;
+    }
+    const forAmbiences = document.querySelectorAll(`x-ambience[for]`);
+    for (const ambience of forAmbiences) {
+      if (ambience.getAttribute("for") === element.id && ambience !== this) {
+        return false;
+      }
+    }
+    return true;
   }
   handleMutation(mutations) {
     mutations.forEach((mutation) => {
-      mutation.addedNodes.filter((node) => node.nodeType === 1 && MEDIA_TAGS.includes(node.nodeName)).forEach((node) => this.mediaElementAdded(node));
-      mutation.removedNodes.filter((node) => node.nodeType === 1 && MEDIA_TAGS.includes(node.nodeName)).forEach((node) => this.mediaElementRemoved(node));
+      const addedMediaElements = [...mutation.addedNodes].filter((node) => node.nodeType === 1 && MEDIA_TAGS.includes(node.nodeName));
+      this.mediaElementAdded(...addedMediaElements);
+      const removedMediaElements = [...mutation.removedNodes].filter((node) => node.nodeType === 1 && MEDIA_TAGS.includes(node.nodeName));
+      this.mediaElementRemoved(...removedMediaElements);
+      if (addedMediaElements.length || removedMediaElements.length) {
+        this.render();
+      }
     });
   }
+  getDisplayId(element) {
+    if (this.#displayIds.has(element)) {
+      return this.#displayIds.get(element);
+    }
+    const nextId = this.#displayIdInc++;
+    this.#displayIds.set(element, nextId);
+    return nextId;
+  }
   createDisplayElement(element) {
-    let displayElement2;
+    const displayElement = document.createElement("div");
+    const slot = displayElement;
+    let mediaDisplayElement;
     if (element instanceof HTMLMediaElement) {
       const canvas = document.createElement("canvas");
       const poster = document.createElement("img");
@@ -726,36 +867,95 @@ var Ambience = class extends HTMLElement {
       canvas.style.width = "100%";
       canvas.style.height = "100%";
       canvas.style.position = "absolute";
-      displayElement2 = document.createElement("div");
-      displayElement2.appendChild(canvas);
-      displayElement2.appendChild(poster);
+      slot.appendChild(canvas);
+      slot.appendChild(poster);
+      mediaDisplayElement = canvas;
+    } else {
+      mediaDisplayElement = element.cloneNode(true);
+      slot.appendChild(mediaDisplayElement);
     }
-    if (!displayElement2) {
-      displayElement2 = element.cloneNode(true);
-    }
-    displayElement2.style.transition = "opacity 0.12s";
-    return displayElement2;
+    this.#displayMediaElements.set(element, mediaDisplayElement);
+    displayElement.classList.add("display");
+    displayElement.setAttribute("part", "display");
+    return displayElement;
+  }
+  clippingTargetAdded(element) {
+    element.addEventListener("scroll", this.handleScroll, { passive: true });
+  }
+  clippingTargetRemoved(element) {
+    element.removeEventListener("scroll", this.handleScroll, { passive: true });
+    this.#clippingDisplayElements.delete(element);
+  }
+  createClippingDisplayElement(element) {
+    const clippingDisplayElement = document.createElement("div");
+    clippingDisplayElement.setAttribute("part", "clip");
+    clippingDisplayElement.setAttribute("data-class", element.getAttribute("class"));
+    return clippingDisplayElement;
   }
   mediaElementAdded(...element) {
     element.forEach((element2) => {
       this.#mediaElements.add(element2);
-      const displayElement2 = this.createDisplayElement(element2);
-      this.#backdropBody.appendChild(displayElement2);
-      this.#displayElements.set(element2, displayElement2);
-      element2.addEventListener("load", this.handleLoad);
+      const scrollParents = getScrollParents(element2, this, ["scroll", "auto", "hidden"]);
+      scrollParents.reverse().forEach((scrollParent2, index, array) => {
+        const parent = index > 0 ? array[index - 1] : null;
+        if (!this.#clippingTargets.has(scrollParent2)) {
+          this.#clippingTargets.add(scrollParent2);
+          if (!this.#clippingDisplayElements.get(scrollParent2)) {
+            const clippingDisplayElement = this.createClippingDisplayElement(scrollParent2);
+            const displayParent2 = this.#clippingDisplayElements.get(parent) || this.#backdrop;
+            displayParent2.appendChild(clippingDisplayElement);
+            this.#clippingDisplayElements.set(scrollParent2, clippingDisplayElement);
+            this.#clippingParents.set(scrollParent2, parent);
+          }
+          this.clippingTargetAdded(scrollParent2);
+        }
+      });
+      const scrollParent = scrollParents.length ? scrollParents[scrollParents.length - 1] : null;
+      const displayParent = this.#clippingDisplayElements.get(scrollParent) || this.#backdrop;
+      const displayElement = this.createDisplayElement(element2);
+      this.#displayElements.set(element2, displayElement);
+      this.#clippingParents.set(element2, scrollParent);
+      displayParent.appendChild(displayElement);
+      element2.addEventListener("loadeddata", this.handleLoad, { passive: true });
+      element2.addEventListener("load", this.handleLoad, { passive: true });
+      element2.addEventListener("play", this.handlePlay, { passive: true });
+      element2.addEventListener("pause", this.handlePause, { passive: true });
+      element2.addEventListener("pointerenter", this.handleStateChange, { passive: true });
+      element2.addEventListener("pointerleave", this.handleStateChange, { passive: true });
+      if (element2 instanceof HTMLMediaElement) {
+        const posterImage = displayElement.querySelector("img");
+        if (posterImage) {
+          posterImage.src = element2.poster;
+          posterImage.addEventListener("load", this.handleLoad, { passive: true });
+        }
+      }
     });
-    this.render();
+    this.mediaElementsChanged();
   }
   mediaElementRemoved(...element) {
     element.forEach((element2) => {
-      this.#mediaElements.delete(element2);
-      this.#backdropBody.removeChild(displayElement);
-      this.#displayElements.delete(element2);
+      element2.removeEventListener("loadeddata", this.handleLoad);
       element2.removeEventListener("load", this.handleLoad);
+      element2.removeEventListener("play", this.handlePlay);
+      element2.removeEventListener("pause", this.handlePause);
+      element2.removeEventListener("pointerenter", this.handleStateChange);
+      element2.removeEventListener("pointerleave", this.handleStateChange);
+      const displayElement = this.#displayElements.get(element2);
+      if (element2 instanceof HTMLMediaElement) {
+        const posterImage = displayElement.querySelector("img");
+        if (posterImage) {
+          posterImage.removeEventListener("load", this.handleLoad, { passive: true });
+        }
+      }
+      displayElement.parentNode.removeChild(displayElement);
+      this.#displayElements.delete(element2);
+      this.#clippingParents.delete(element2);
+      this.#mediaElements.delete(element2);
     });
-    this.render();
+    this.mediaElementsChanged();
   }
   addTargetElement(...elements) {
+    const addedMediaElements = [];
     elements.filter((element) => !this.#assignedChildren.has(element)).forEach((element) => {
       this.#assignedChildren.add(element);
       const mutationObserver = new MutationObserver(this.handleMutation);
@@ -764,23 +964,37 @@ var Ambience = class extends HTMLElement {
         subtree: true
       });
       this.#mutationObservers.set(element, mutationObserver);
+      element.addEventListener("animationstart", this.handlePlay, { passive: true });
+      element.addEventListener("transitionstart", this.handlePlay, { passive: true });
+      element.addEventListener("animationend", this.handlePause, { passive: true });
+      element.addEventListener("transitionend", this.handlePause, { passive: true });
       const nodes = [...element.querySelectorAll(MEDIA_TAGS.join(", "))];
       if (MEDIA_TAGS.includes(element.nodeName)) {
         nodes.push(element);
       }
-      this.mediaElementAdded(...nodes);
+      addedMediaElements.push(...nodes);
     });
+    this.mediaElementAdded(...addedMediaElements);
   }
   removeTargetElement(...elements) {
+    const removedMediaElements = [];
     elements.filter((element) => this.#assignedChildren.has(element)).forEach((element) => {
       const mutationObserver = this.#mutationObservers.get(element);
       mutationObserver.disconnect();
       this.#mutationObservers.delete(element);
+      element.removeEventListener("animationstart", this.handlePlay);
+      element.removeEventListener("transitionstart", this.handlePlay);
+      element.removeEventListener("animationend", this.handlePause);
+      element.removeEventListener("transitionend", this.handlePause);
       this.#assignedChildren.delete(element);
       if (MEDIA_TAGS.includes(element.nodeName)) {
-        this.mediaElementRemoved(element);
+        removedMediaElements.push(element);
       }
     });
+    this.mediaElementRemoved(...removedMediaElements);
+  }
+  removeAllTargetElements() {
+    this.removeTargetElement(...this.#assignedChildren);
   }
   handleSlotChange(e) {
     if (this.hasAttribute("for")) {
@@ -792,23 +1006,127 @@ var Ambience = class extends HTMLElement {
     const addedNodes = slot.assignedElements().filter((x) => !assignedElements.includes(x));
     this.addTargetElement(...addedNodes);
     this.removeTargetElement(...removedNodes);
+    this.targetElementsChanged();
+  }
+  handleScroll(event) {
+    this.render();
   }
   handleResize() {
     this.render();
   }
   handleLoad(event) {
-    console.log("handleLoad", event.target.src);
     window.requestAnimationFrame(() => {
       this.render();
     });
   }
+  handleStateChange(event) {
+    const element = event.target;
+    this.updateMediaElement(element);
+  }
+  startAnimation(element, id) {
+    let elementAnimations;
+    if (this.#elementAnimations.has(element)) {
+      elementAnimations = this.#elementAnimations.get(element);
+      elementAnimations.add(id);
+    } else {
+      elementAnimations = /* @__PURE__ */ new Set();
+      elementAnimations.add(id);
+      this.#elementAnimations.set(element, elementAnimations);
+    }
+    this.#animatedElements.add(element);
+    this.animate();
+  }
+  endAnimation(element, id) {
+    if (!this.#elementAnimations.has(element)) {
+      return;
+    }
+    const elementAnimations = this.#elementAnimations.get(element);
+    elementAnimations.delete(id);
+    if (elementAnimations.size === 0) {
+      this.#elementAnimations.delete(element);
+      this.#animatedElements.delete(element);
+    }
+  }
+  getAnimationId(event) {
+    if (event.type === "play" || event.type === "pause") {
+      return `playback`;
+    }
+    if (event.type === "animationstart" || event.type === "animationend") {
+      return `animation-${event.animationName}`;
+    }
+    if (event.type === "transitionstart" || event.type === "transitionend") {
+      return `transition-${event.propertyName}`;
+    }
+    return null;
+  }
+  handlePlay(event) {
+    this.startAnimation(event.target, this.getAnimationId(event));
+  }
+  handlePause(event) {
+    this.endAnimation(event.target, this.getAnimationId(event));
+  }
+  isAnimating() {
+    return this.#animated || this.#elementAnimations.size > 0;
+  }
+  set animated(value) {
+    this.#animated = value;
+    this.animate();
+  }
+  get animated() {
+    return this.#animated || this.#animatedElements.size > 0;
+  }
+  animate() {
+    if (this.animated) {
+      this.render();
+    }
+    window.requestAnimationFrame(() => {
+      if (this.animated) {
+        this.animate();
+      }
+      ;
+    });
+  }
   connectedCallback() {
-    const slot = this.shadowRoot.querySelector("slot");
-    slot.addEventListener("slotchange", this.handleSlotChange);
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener("resize", this.handleResize, { passive: true });
+    this.#slot.addEventListener("slotchange", this.handleSlotChange);
+    this.#scrollParent = getScrollParent(this);
+    this.render();
   }
   detachedCallback() {
     window.removeEventListener("resize", this.handleResize);
+    this.#slot.removeEventListener("slotchange", this.handleSlotChange);
+    this.#scrollParent = null;
+  }
+  mediaElementsChanged() {
+    this.render();
+  }
+  targetElementsChanged() {
+    const targetElements = [...this.#assignedChildren];
+    let isClipping = true;
+    const hasOnlyMediaElements = targetElements.every((element) => MEDIA_TAGS.includes(element.nodeName));
+    if (!hasOnlyMediaElements) {
+      isClipping = false;
+    } else {
+      const clippingTargets = this.getClippingTargets();
+      if (clippingTargets.size === 0) {
+        isClipping = false;
+      }
+    }
+    this.render();
+  }
+  getClippingTargets() {
+    const clippingTargets = /* @__PURE__ */ new Set();
+    const mediaElements = [...this.#mediaElements];
+    for (const element of mediaElements) {
+      const scrollParent = getScrollParent(element);
+      if (scrollParent && scrollParent !== this.#scrollParent) {
+        clippingTargets.add(scrollParent);
+      }
+    }
+    return clippingTargets;
+  }
+  get isClipping() {
+    return this.#internals.states.has("--clip");
   }
   get clipArea() {
     let bounds = [...this.#assignedChildren].reduce((bounds2, element) => {
@@ -839,65 +1157,123 @@ var Ambience = class extends HTMLElement {
     bounds.right -= targetBounds.left;
     return bounds;
   }
+  getZIndex() {
+    const computedStyle = window.getComputedStyle(this.#backdrop);
+    let zIndex = computedStyle.getPropertyValue("--x-ambience-z-index");
+    if (!zIndex || zIndex === "auto") {
+      zIndex = !!getPositioonFixedParent(this) ? "" : -1;
+    }
+    return zIndex;
+  }
+  updateClippingDisplayElement(element) {
+    const clippingDisplayElement = this.#clippingDisplayElements.get(element);
+    if (!clippingDisplayElement) {
+      return;
+    }
+    const parent = this.#clippingParents.get(element) || this.#backdrop;
+    const clippingArea = element.getBoundingClientRect();
+    const targetBounds = parent.getBoundingClientRect();
+    clippingDisplayElement.style.setProperty("transform", `translate3d(${clippingArea.left - targetBounds.left}px, ${clippingArea.top - targetBounds.top}px, 0)`);
+    clippingDisplayElement.style.setProperty("width", `${clippingArea.width}px`);
+    clippingDisplayElement.style.setProperty("height", `${clippingArea.height}px`);
+  }
+  updateClippingDisplayElements() {
+    for (const element of this.#clippingTargets) {
+      this.updateClippingDisplayElement(element);
+    }
+  }
+  isElementReady(element) {
+    if (element instanceof HTMLMediaElement) {
+      if (element.poster && element.played.length === 0) {
+        const displayElement = this.#displayElements.get(element);
+        const poster = displayElement.querySelector("img");
+        return poster.complete;
+      }
+      return element.readyState >= 3;
+    }
+    if (element instanceof HTMLImageElement) {
+      return element.complete;
+    }
+    return true;
+  }
+  updateMediaElement(element) {
+    const displayElement = this.#displayElements.get(element);
+    if (!displayElement) {
+      return;
+    }
+    const targetParent = this.#clippingParents.get(element) || this.#backdrop;
+    const targetBounds = targetParent.getBoundingClientRect();
+    const elementBounds = element.getBoundingClientRect();
+    const top = elementBounds.top - targetBounds.top;
+    const left = elementBounds.left - targetBounds.left;
+    displayElement.style.setProperty("transform", `translate3d(${left}px, ${top}px, 0)`);
+    displayElement.setAttribute("part", this.isElementReady(element) ? "display ready" : "display");
+    const mediaDisplayElement = this.#displayMediaElements.get(element);
+    copyStyles(mediaDisplayElement, element);
+    mediaDisplayElement.style.setProperty("width", `${elementBounds.width}px`);
+    mediaDisplayElement.style.setProperty("height", `${elementBounds.height}px`);
+    if (element instanceof HTMLMediaElement) {
+      const canvas = displayElement.querySelector("canvas");
+      const poster = displayElement.querySelector("img");
+      const isPoster = element.poster && element.played.length === 0;
+      poster.style.setProperty("width", `${elementBounds.width}px`);
+      poster.style.setProperty("height", `${elementBounds.height}px`);
+      poster.style.setProperty("display", isPoster ? "block" : "none");
+      if (!isPoster) {
+        canvas.width = elementBounds.width;
+        canvas.height = elementBounds.height;
+        const context = canvas.getContext("2d");
+        context.drawImage(element, 0, 0, canvas.width, canvas.height);
+      }
+    }
+  }
+  updateMediaElements() {
+    for (const element of this.#mediaElements) {
+      this.updateMediaElement(element);
+    }
+  }
   render() {
-    const bounds = this.getBoundingClientRect();
-    const backdrop = this.#backdrop;
-    const targetBounds = backdrop.getBoundingClientRect();
+    if (!this.isConnected || !this.parentNode) {
+      return;
+    }
+    if (!this.#scrollParent) {
+      return;
+    }
     if (this.#mediaElements.size === 0) {
       return;
     }
-    for (const element of this.#mediaElements) {
-      const style = window.getComputedStyle(element);
-      const copyStyles = ["filter", "transition", "visibility"];
-      let elementBounds = element.getBoundingClientRect();
-      const top = elementBounds.top - targetBounds.top;
-      const left = elementBounds.left - targetBounds.left;
-      const displayElement2 = this.#displayElements.get(element);
-      displayElement2.style.display = "block";
-      displayElement2.style.marginLeft = "0";
-      displayElement2.style.marginTop = "0";
-      displayElement2.style.margin = "0";
-      displayElement2.style.position = "absolute";
-      copyStyles.forEach((name) => {
-        displayElement2.style[name] = style[name];
-      });
-      if (elementBounds.width > 0 && elementBounds.height > 0) {
-        displayElement2.style.transform = `translate(${left}px, ${top}px)`;
-        displayElement2.style.width = `${elementBounds.width}px`;
-        displayElement2.style.height = `${elementBounds.height}px`;
-        displayElement2.style.opacity = 1;
+    const zIndex = this.getZIndex();
+    this.#backdrop.style.setProperty("z-index", zIndex);
+    this.updateClippingDisplayElements();
+    this.updateMediaElements();
+  }
+  set for(value) {
+    if (value !== this.for) {
+      if (value) {
+        this.setAttribute("for", value);
       } else {
-        displayElement2.style.opacity = 0;
+        this.removeAttribute("for");
       }
-      if (element instanceof HTMLMediaElement) {
-        const canvas = displayElement2.querySelector("canvas");
-        const poster = displayElement2.querySelector("img");
-        const isPoster = element.poster && element.played.length === 0;
-        poster.style.display = isPoster ? "block" : "none";
-        if (!isPoster) {
-          canvas.width = elementBounds.width;
-          canvas.height = elementBounds.height;
-          const context = canvas.getContext("2d");
-          context.drawImage(element, 0, 0, canvas.width, canvas.height);
+      this.removeAllTargetElements();
+      this.#for = value;
+      if (this.#for) {
+        const targetElement = document.querySelector(`#${this.#for}`);
+        if (targetElement) {
+          this.addTargetElement(targetElement);
         }
       }
     }
-    const clipArea = this.clipArea;
-    const clipPath = `polygon(${clipArea.left}px ${clipArea.top}px,${clipArea.right}px ${clipArea.top}px,${clipArea.right}px ${clipArea.bottom}px,${clipArea.left}px ${clipArea.bottom}px)`;
-    this.#backdropBody.style.clipPath = clipPath;
-    window.requestAnimationFrame(() => {
-      this.render();
-    });
+  }
+  get for() {
+    return this.#for;
   }
   attributeChangedCallback(name, oldValue, newValue) {
-    if (oldValue === newValue) {
-      return;
-    }
-    if (name === "for") {
-      const targetElement = document.querySelector(`#${newValue}`);
-      if (targetElement) {
-        this.removeTargetElement(targetElement);
-        this.addTargetElement(targetElement);
+    if (oldValue === newValue) return;
+    if (Reflect.has(this, name)) {
+      const isBool = typeof this[name] === "boolean";
+      const value = isBool ? this.hasAttribute(name) : newValue;
+      if (value !== this[name]) {
+        this[name] = value;
       }
     }
   }
