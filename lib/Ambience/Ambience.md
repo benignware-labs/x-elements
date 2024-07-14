@@ -5,6 +5,8 @@
 
 Creates atmospheric backdrop for images and videos.
 
+
+
 ## Example: Image
 
 <!-- Example -->
@@ -46,42 +48,6 @@ Creates atmospheric backdrop for images and videos.
 />
 <x-ambience for="testimg"/>
 ```
-
-
-
-## Example: States and Transitions
-
-<!-- Example -->
-```html
-<x-ambience>
-  <img
-    src="https://picsum.photos/id/56/800/450"
-    class="img"
-    onclick="this.classList.toggle('active')"
-  />
-</x-ambience>
-```
-
-```css
-.img {
-  aspect-ratio: 16/9;
-  width: 100%;
-  height: auto;
-  filter: grayscale(100%);
-  transform: scale(0.75);
-  transition: all 0.2s ease-in;
-}
-
-.img:hover {
-  transform: scale(1);
-}
-
-.img.active {
-  filter: grayscale(0);
-}
-```
-
-
 
 ## Example: Clip
 
@@ -233,3 +199,57 @@ slider.addEventListener('click', event => {
   </div>
 </x-ambience>
 ```
+
+
+
+
+## Example: States and Transitions
+
+<!-- Example -->
+```html
+
+<x-ambience>
+  <div class="thumbnails">
+    <img
+      src="https://picsum.photos/id/19/800/450"
+      class="img"
+      onclick="this.classList.toggle('active')"
+    />
+    <img
+      src="https://picsum.photos/id/19/800/450"
+      class="img animated"
+      onclick="this.classList.toggle('active')"
+    />
+  </div>
+</x-ambience>
+```
+
+```css
+.thumbnails {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  width: 100px;
+  height: auto;
+  filter: grayscale(100%);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  scale: 1;
+}
+
+.img.animated {
+  transition: all .15s ease-in-out;
+}
+
+.img:hover {
+  filter: grayscale(0);
+  clip-path: polygon(50% 0%, 73% 17%, 98% 35%, 89% 61%, 79% 91%, 49% 91%, 21% 91%, 11% 63%, 2% 35%, 26% 18%);
+  scale: 1.1;
+}
+```
+
