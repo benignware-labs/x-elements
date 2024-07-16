@@ -6,7 +6,6 @@
 Creates atmospheric backdrop for images and videos.
 
 
-
 ## Example: Image
 
 <!-- Example -->
@@ -96,6 +95,29 @@ Creates atmospheric backdrop for images and videos.
 ```
 
 
+
+## Example: Clip with fixed elements
+
+<!-- Example -->
+```html
+<div id="cliptest" class="cover">
+  <img
+    src="https://picsum.photos/id/56/800/450"
+    style="aspect-ratio: 16/9; width: 100%; height: 100%; position: fixed; top: 0; bottom: 0; object-fit: cover"
+  />
+</div>
+<x-ambience for="cliptest" />
+```
+
+```css
+.cover {
+  overflow: hidden;
+  width: 100%;
+  height: 300px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+```
 
 
 
