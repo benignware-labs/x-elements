@@ -9,6 +9,56 @@ Consistent media controls across browsers
 ## Example
 
 <!-- Example -->
+```html
+<x-media-controls controlslist="">
+  <video
+    style="width: 100%; height: auto;"
+    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    poster="https://picsum.photos/id/211/800/450"
+    loop
+    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+    muted
+  ></video>
+</x-media-controls>
+```
+
+## Example: "for"-Attribute
+
+<!-- Example -->
+
+```html
+<video
+  id="testvideo"
+  style="width: 100%; height: auto; border-radius: 15px; "
+  src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  poster="https://picsum.photos/id/211/800/450"
+  loop
+  onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+  muted
+></video>
+<x-media-controls for="testvideo"/>
+```
+
+## Example: ControlsList
+
+<!-- Example -->
+
+```html
+<x-media-controls controlslist="notime novolume nofullscreen">
+  <video
+    style="width: 100%; height: auto;"
+    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    poster="https://picsum.photos/id/211/800/450"
+    loop
+    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+    muted
+  ></video>
+</x-media-controls>
+```
+
+## Example: Customize
+
+<!-- Example -->
 
 Obtain Font Awesome from cdn
 
@@ -28,27 +78,38 @@ x-media-controls {
   --x-icon-pause: "\f04c";
   --x-icon-mute: "\f6a9";
   --x-icon-unmute: "\f028";
+  --x-volume-slider-expand: 0;
  
   border-radius: 0.5rem
-}
-
-/*
-x-media-controls {
- --x-volume-slider-expand: 0;
 }
 
 x-media-controls::part(volume-control),
 x-media-controls::part(play-button) {
   order: -1;
 }
-*/
+
+x-media-controls:not(:state(--fullscreen))::part(controls-panel) {
+  --x-controls-bg: transparent;
+  opacity: 1;
+  transform: none;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+x-media-controls:not(:state(--fullscreen))::part(overlay-playbutton),
+x-media-controls:not(:state(--fullscreen))::part(timeline),
+x-media-controls:not(:state(--fullscreen))::part(current-time),
+x-media-controls:not(:state(--fullscreen))::part(duration),
+x-media-controls:not(:state(--fullscreen))::part(play-button) {
+  display: none;
+}
 ```
 
 Provide the actual markup
 
 ```html
 <x-ambience>
-  <x-media-controls controlslist="">
+  <x-media-controls id="media-controls" controlslist="notime noplay">
     <video
       style="width: 100%; height: auto;"
       src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
@@ -56,7 +117,24 @@ Provide the actual markup
       loop
       onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
       muted
+      autoplay
     ></video>
   </x-media-controls>
 </x-ambience>
+```
+
+Show all controls in fullscreen
+
+```js
+const mc = document.querySelector('#media-controls');
+
+mc.addEventListener('fullscreenchange', (e) => {
+  const isFullscreen = !!document.fullscreenElement;
+
+  if (!isFullscreen) {
+    mc.setAttribute('controlslist', 'notime noplay');
+  } else {
+    mc.removeAttribute('controlslist');
+  }
+})
 ```
