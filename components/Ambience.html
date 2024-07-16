@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+    <!-- <link rel="stylesheet" href="public/400-778daa1066fcc9c181a5d4dec3c4b74e.css"> -->
 
     <!-- <style>
       @font-face {
@@ -195,7 +196,7 @@
 <h2>Example: Image</h2>
 <p>
 
-  <template id="example-6-template">
+  <template id="example-9-template">
     
 
     
@@ -210,7 +211,7 @@
 
     </div>
   </template>
-  <example-viewer class="example" id="example-6-viewer" template="#example-6-template">
+  <example-viewer class="example" id="example-9-viewer" template="#example-9-template">
 
   </example-viewer>
 </p>
@@ -224,7 +225,7 @@
 <h2>Example: Video</h2>
 <p>
 
-  <template id="example-7-template">
+  <template id="example-10-template">
     
 
     
@@ -244,7 +245,7 @@
 
     </div>
   </template>
-  <example-viewer class="example" id="example-7-viewer" template="#example-7-template">
+  <example-viewer class="example" id="example-10-viewer" template="#example-10-template">
 
   </example-viewer>
 </p>
@@ -263,7 +264,7 @@
 <h2>Example: &quot;for&quot;-Attribute</h2>
 <p>
 
-  <template id="example-8-template">
+  <template id="example-11-template">
     
 
     
@@ -278,7 +279,7 @@
 
     </div>
   </template>
-  <example-viewer class="example" id="example-8-viewer" template="#example-8-template">
+  <example-viewer class="example" id="example-11-viewer" template="#example-11-template">
 
   </example-viewer>
 </p>
@@ -289,74 +290,10 @@
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;testimg&quot;</span>/&gt;</span>
 </code></pre>
-<h2>Example: States and Transitions</h2>
-<p>
-
-  <template id="example-9-template">
-    
-
-    <style>.img {
-  aspect-ratio: 16/9;
-  width: 100%;
-  height: auto;
-  filter: grayscale(100%);
-  transform: scale(0.75);
-  transition: all 0.2s ease-in;
-}
-
-.img:hover {
-  transform: scale(1);
-}
-
-.img.active {
-  filter: grayscale(0);
-}
-</style>
-
-    <div class="example-body">
-      <x-ambience>
-  <img
-    src="https://picsum.photos/id/56/800/450"
-    class="img"
-    onclick="this.classList.toggle('active')"
-  />
-</x-ambience>
-
-    </div>
-  </template>
-  <example-viewer class="example" id="example-9-viewer" template="#example-9-template">
-
-  </example-viewer>
-</p>
-<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
-    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/56/800/450&quot;</span>
-    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;img&quot;</span>
-    <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.classList.toggle(&#x27;active&#x27;)&quot;</span>
-  /&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
-</code></pre>
-<pre><code class="hljs"><span class="hljs-selector-class">.img</span> {
-  aspect-ratio: <span class="hljs-number">16</span>/<span class="hljs-number">9</span>;
-  <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
-  <span class="hljs-attribute">height</span>: auto;
-  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">grayscale</span>(<span class="hljs-number">100%</span>);
-  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">scale</span>(<span class="hljs-number">0.75</span>);
-  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease-in;
-}
-
-<span class="hljs-selector-class">.img</span><span class="hljs-selector-pseudo">:hover</span> {
-  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">scale</span>(<span class="hljs-number">1</span>);
-}
-
-<span class="hljs-selector-class">.img</span><span class="hljs-selector-class">.active</span> {
-  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">grayscale</span>(<span class="hljs-number">0</span>);
-}
-</code></pre>
 <h2>Example: Clip</h2>
 <p>
 
-  <template id="example-10-template">
+  <template id="example-12-template">
     
 
     
@@ -373,7 +310,7 @@
 
     </div>
   </template>
-  <example-viewer class="example" id="example-10-viewer" template="#example-10-template">
+  <example-viewer class="example" id="example-12-viewer" template="#example-12-template">
 
   </example-viewer>
 </p>
@@ -389,7 +326,7 @@
 <h2>Example: Nested Clip</h2>
 <p>
 
-  <template id="example-11-template">
+  <template id="example-13-template">
     
 
     <style>.overflow {
@@ -420,7 +357,7 @@
 
     </div>
   </template>
-  <example-viewer class="example" id="example-11-viewer" template="#example-11-template">
+  <example-viewer class="example" id="example-13-viewer" template="#example-13-template">
 
   </example-viewer>
 </p>
@@ -448,10 +385,56 @@
 }
 
 </code></pre>
+<h2>Example: Clip with fixed elements</h2>
+<p>
+
+  <template id="example-14-template">
+    
+
+    <style>.cover {
+  overflow: hidden;
+  width: 100%;
+  height: 300px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+</style>
+
+    <div class="example-body">
+      <div id="cliptest" class="cover">
+  <img
+    src="https://picsum.photos/id/56/800/450"
+    style="aspect-ratio: 16/9; width: 100%; height: 100%; position: fixed; top: 0; bottom: 0; object-fit: cover"
+  />
+</div>
+<x-ambience for="cliptest" />
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-14-viewer" template="#example-14-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;cliptest&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;cover&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/56/800/450&quot;</span>
+    <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;aspect-ratio: 16/9; width: 100%; height: 100%; position: fixed; top: 0; bottom: 0; object-fit: cover&quot;</span>
+  /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;cliptest&quot;</span> /&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-selector-class">.cover</span> {
+  <span class="hljs-attribute">overflow</span>: hidden;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">300px</span>;
+  <span class="hljs-attribute">clip-path</span>: <span class="hljs-built_in">polygon</span>(<span class="hljs-number">0</span> <span class="hljs-number">0</span>, <span class="hljs-number">100%</span> <span class="hljs-number">0</span>, <span class="hljs-number">100%</span> <span class="hljs-number">100%</span>, <span class="hljs-number">0%</span> <span class="hljs-number">100%</span>);
+}
+
+</code></pre>
 <h2>Example: Slider</h2>
 <p>
 
-  <template id="example-12-template">
+  <template id="example-15-template">
     
 
     <style>.slider {
@@ -548,7 +531,7 @@ slider.addEventListener('click', event => {
 
     </div>
   </template>
-  <example-viewer class="example" id="example-12-viewer" template="#example-12-template">
+  <example-viewer class="example" id="example-15-viewer" template="#example-15-template">
 
   </example-viewer>
 </p>
@@ -642,6 +625,106 @@ slider.<span class="hljs-title function_">addEventListener</span>(<span class="h
     <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;slider-prev&quot;</span>&gt;</span>Prev<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<h2>Example: States and Transitions</h2>
+<p>
+
+  <template id="example-16-template">
+    
+
+    <style>.thumbnails {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  width: 100px;
+  height: auto;
+  filter: grayscale(100%);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  scale: 1;
+}
+
+.img.animated {
+  transition: all .15s ease-in-out;
+}
+
+.img:hover {
+  filter: grayscale(0);
+  clip-path: polygon(50% 0%, 73% 17%, 98% 35%, 89% 61%, 79% 91%, 49% 91%, 21% 91%, 11% 63%, 2% 35%, 26% 18%);
+  scale: 1.1;
+}
+</style>
+
+    <div class="example-body">
+      
+<x-ambience>
+  <div class="thumbnails">
+    <img
+      src="https://picsum.photos/id/19/800/450"
+      class="img"
+      onclick="this.classList.toggle('active')"
+    />
+    <img
+      src="https://picsum.photos/id/19/800/450"
+      class="img animated"
+      onclick="this.classList.toggle('active')"
+    />
+  </div>
+</x-ambience>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-16-viewer" template="#example-16-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs">
+<span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;thumbnails&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+      <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/19/800/450&quot;</span>
+      <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;img&quot;</span>
+      <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.classList.toggle(&#x27;active&#x27;)&quot;</span>
+    /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">img</span>
+      <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://picsum.photos/id/19/800/450&quot;</span>
+      <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;img animated&quot;</span>
+      <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.classList.toggle(&#x27;active&#x27;)&quot;</span>
+    /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs"><span class="hljs-selector-class">.thumbnails</span> {
+  <span class="hljs-attribute">display</span>: flex;
+  <span class="hljs-attribute">gap</span>: <span class="hljs-number">1.5rem</span>;
+  <span class="hljs-attribute">position</span>: relative;
+  <span class="hljs-attribute">z-index</span>: <span class="hljs-number">1</span>;
+}
+
+<span class="hljs-selector-class">.img</span> {
+  aspect-ratio: <span class="hljs-number">1</span>;
+  <span class="hljs-attribute">object-fit</span>: cover;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">100px</span>;
+  <span class="hljs-attribute">height</span>: auto;
+  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">grayscale</span>(<span class="hljs-number">100%</span>);
+  <span class="hljs-attribute">clip-path</span>: <span class="hljs-built_in">polygon</span>(<span class="hljs-number">50%</span> <span class="hljs-number">0%</span>, <span class="hljs-number">61%</span> <span class="hljs-number">35%</span>, <span class="hljs-number">98%</span> <span class="hljs-number">35%</span>, <span class="hljs-number">68%</span> <span class="hljs-number">57%</span>, <span class="hljs-number">79%</span> <span class="hljs-number">91%</span>, <span class="hljs-number">50%</span> <span class="hljs-number">70%</span>, <span class="hljs-number">21%</span> <span class="hljs-number">91%</span>, <span class="hljs-number">32%</span> <span class="hljs-number">57%</span>, <span class="hljs-number">2%</span> <span class="hljs-number">35%</span>, <span class="hljs-number">39%</span> <span class="hljs-number">35%</span>);
+  scale: <span class="hljs-number">1</span>;
+}
+
+<span class="hljs-selector-class">.img</span><span class="hljs-selector-class">.animated</span> {
+  <span class="hljs-attribute">transition</span>: all .<span class="hljs-number">15s</span> ease-in-out;
+}
+
+<span class="hljs-selector-class">.img</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">grayscale</span>(<span class="hljs-number">0</span>);
+  <span class="hljs-attribute">clip-path</span>: <span class="hljs-built_in">polygon</span>(<span class="hljs-number">50%</span> <span class="hljs-number">0%</span>, <span class="hljs-number">73%</span> <span class="hljs-number">17%</span>, <span class="hljs-number">98%</span> <span class="hljs-number">35%</span>, <span class="hljs-number">89%</span> <span class="hljs-number">61%</span>, <span class="hljs-number">79%</span> <span class="hljs-number">91%</span>, <span class="hljs-number">49%</span> <span class="hljs-number">91%</span>, <span class="hljs-number">21%</span> <span class="hljs-number">91%</span>, <span class="hljs-number">11%</span> <span class="hljs-number">63%</span>, <span class="hljs-number">2%</span> <span class="hljs-number">35%</span>, <span class="hljs-number">26%</span> <span class="hljs-number">18%</span>);
+  scale: <span class="hljs-number">1.1</span>;
+}
 </code></pre>
 
     </div>

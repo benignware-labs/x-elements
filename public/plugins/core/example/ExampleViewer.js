@@ -101,8 +101,14 @@
   globalThis.document = getDocumentProxy(globalThis.document);
   
   class ExampleViewer extends HTMLElement {
+    #styleSheets = [];
+    #styleSheetLinks = [];
+    #scripts = [];
+  
     constructor() {
       super();
+
+      this.handleStyleSheetLoaded = this.handleStyleSheetLoaded.bind(this);
   
       this.attachShadow({ mode: "open" });
 
@@ -129,6 +135,45 @@
       addShadowHost(this);
     }
 
+    handleStyleSheetLoaded(event) {
+      console.log('****** stylesheet loaded', event.currentTarget.sheet);
+      for (
+        let i = 0;
+        i < event.currentTarget.sheet.cssRules.length;
+        i++
+    ) {
+        if (event.currentTarget.sheet.cssRules[i].type == 5) { // type 5 is @font-face
+            const split = event.currentTarget.href.split('/');
+            const stylePath = split
+                .slice(0, split.length - 1)
+                .join('/');
+            let cssText =
+                event.currentTarget.sheet.cssRules[i].cssText;
+            cssText = cssText.replace(
+                // relative paths
+                /url\s*\(\s*[\'"]?(?!((\/)|((?:https?:)?\/\/)|(?:data\:?:)))([^\'"\)]+)[\'"]?\s*\)/g,
+                `url("${stylePath}/$4")`
+            );
+
+            const st = document.createElement('style');
+            st.appendChild(document.createTextNode(cssText));
+            document
+                .getElementsByTagName('head')[0]
+                .appendChild(st);
+        }
+      }
+
+      this.#styleSheets.push(event.currentTarget.sheet);
+
+      if (this.isComplete()) {
+        this.completeCallback();
+      }
+    }
+
+    isComplete() {
+      return this.#styleSheetLinks.every((link) => link.sheet);
+    }
+
     connectedCallback() {
       const templateSelector = this.getAttribute("template");
       const template = document.querySelector(templateSelector);
@@ -139,41 +184,29 @@
       }
   
       const content = template.content.cloneNode(true);
+
+      // const scripts = content.querySelectorAll('script');
+
+      // scripts.forEach((script) => {
+      //   this.#scripts.push(script);
+      //   script.parentNode.removeChild(script);
+      // });
   
       this.shadowRoot.appendChild(content);
 
       const cssrefs = this.shadowRoot.querySelectorAll('link[rel="stylesheet"]');
 
-      cssrefs.forEach((link) => {
-        link.addEventListener('load', (event) => {
-          console.log('loaded', event.currentTarget.sheet);
-          for (
-            let i = 0;
-            i < event.currentTarget.sheet.cssRules.length;
-            i++
-        ) {
-            if (event.currentTarget.sheet.cssRules[i].type == 5) { // type 5 is @font-face
-                const split = event.currentTarget.href.split('/');
-                const stylePath = split
-                    .slice(0, split.length - 1)
-                    .join('/');
-                let cssText =
-                    event.currentTarget.sheet.cssRules[i].cssText;
-                cssText = cssText.replace(
-                    // relative paths
-                    /url\s*\(\s*[\'"]?(?!((\/)|((?:https?:)?\/\/)|(?:data\:?:)))([^\'"\)]+)[\'"]?\s*\)/g,
-                    `url("${stylePath}/$4")`
-                );
+      console.log('CSS REFS', cssrefs);
 
-                const st = document.createElement('style');
-                st.appendChild(document.createTextNode(cssText));
-                document
-                    .getElementsByTagName('head')[0]
-                    .appendChild(st);
-            }
-        }
-        });
+      cssrefs.forEach((link) => {
+        console.log('ADD LINK', link.href);
+        this.#styleSheetLinks.push(link);
+        link.addEventListener('load', this.handleStyleSheetLoaded);
       });
+    }
+
+    completeCallback() {
+      console.log('*** complete');
     }
 
     disconnectedCallback() {

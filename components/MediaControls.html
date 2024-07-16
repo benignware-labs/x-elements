@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+    <!-- <link rel="stylesheet" href="public/400-778daa1066fcc9c181a5d4dec3c4b74e.css"> -->
 
     <!-- <style>
       @font-face {
@@ -198,6 +199,117 @@
   <template id="example-5-template">
     
 
+    
+
+    <div class="example-body">
+      <x-media-controls controlslist="">
+  <video
+    style="width: 100%; height: auto;"
+    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    poster="https://picsum.photos/id/211/800/450"
+    loop
+    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+    muted
+  ></video>
+</x-media-controls>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-5-viewer" template="#example-5-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+    <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto;&quot;</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/211/800/450&quot;</span>
+    <span class="hljs-attr">loop</span>
+    <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
+    <span class="hljs-attr">muted</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-media-controls</span>&gt;</span>
+</code></pre>
+<h2>Example: &quot;for&quot;-Attribute</h2>
+<p>
+
+  <template id="example-6-template">
+    
+
+    
+
+    <div class="example-body">
+      <video
+  id="testvideo"
+  style="width: 100%; height: auto; border-radius: 15px; "
+  src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  poster="https://picsum.photos/id/211/800/450"
+  loop
+  onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+  muted
+></video>
+<x-media-controls for="testvideo"/>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-6-viewer" template="#example-6-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+  <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;testvideo&quot;</span>
+  <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto; border-radius: 15px; &quot;</span>
+  <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+  <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/211/800/450&quot;</span>
+  <span class="hljs-attr">loop</span>
+  <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
+  <span class="hljs-attr">muted</span>
+&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;testvideo&quot;</span>/&gt;</span>
+</code></pre>
+<h2>Example: ControlsList</h2>
+<p>
+
+  <template id="example-7-template">
+    
+
+    
+
+    <div class="example-body">
+      <x-media-controls controlslist="notime novolume nofullscreen">
+  <video
+    style="width: 100%; height: auto;"
+    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    poster="https://picsum.photos/id/211/800/450"
+    loop
+    onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
+    muted
+  ></video>
+</x-media-controls>
+
+    </div>
+  </template>
+  <example-viewer class="example" id="example-7-viewer" template="#example-7-template">
+
+  </example-viewer>
+</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;notime novolume nofullscreen&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+    <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto;&quot;</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;https://picsum.photos/id/211/800/450&quot;</span>
+    <span class="hljs-attr">loop</span>
+    <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
+    <span class="hljs-attr">muted</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">x-media-controls</span>&gt;</span>
+</code></pre>
+<h2>Example: Customize</h2>
+<p>
+
+  <template id="example-8-template">
+    
+
     <style>x-media-controls {
   --x-icon-font-family: "Font Awesome 6 Free";
   --x-icon-font-weight: 900;
@@ -207,26 +319,48 @@
   --x-icon-pause: "\f04c";
   --x-icon-mute: "\f6a9";
   --x-icon-unmute: "\f028";
+  --x-volume-slider-expand: 0;
  
   border-radius: 0.5rem
-}
-
-/*
-x-media-controls {
- --x-volume-slider-expand: 0;
 }
 
 x-media-controls::part(volume-control),
 x-media-controls::part(play-button) {
   order: -1;
 }
-*/
-</style>
+
+x-media-controls:not(:state(--fullscreen))::part(controls-panel) {
+  --x-controls-bg: transparent;
+  opacity: 1;
+  transform: none;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+x-media-controls:not(:state(--fullscreen))::part(overlay-playbutton),
+x-media-controls:not(:state(--fullscreen))::part(timeline),
+x-media-controls:not(:state(--fullscreen))::part(current-time),
+x-media-controls:not(:state(--fullscreen))::part(duration),
+x-media-controls:not(:state(--fullscreen))::part(play-button) {
+  display: none;
+}
+</style><script>(() => {const mc = document.querySelector('#media-controls');
+
+mc.addEventListener('fullscreenchange', (e) => {
+  const isFullscreen = !!document.fullscreenElement;
+
+  if (!isFullscreen) {
+    mc.setAttribute('controlslist', 'notime noplay');
+  } else {
+    mc.removeAttribute('controlslist');
+  }
+})
+})()</script>
 
     <div class="example-body">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <x-ambience>
-  <x-media-controls controlslist="">
+  <x-media-controls id="media-controls" controlslist="notime noplay">
     <video
       style="width: 100%; height: auto;"
       src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
@@ -234,13 +368,14 @@ x-media-controls::part(play-button) {
       loop
       onloadedmetadata="//this.muted = true // Firefox won't autplay when initially muted "
       muted
+      autoplay
     ></video>
   </x-media-controls>
 </x-ambience>
 
     </div>
   </template>
-  <example-viewer class="example" id="example-5-viewer" template="#example-5-template">
+  <example-viewer class="example" id="example-8-viewer" template="#example-8-template">
 
   </example-viewer>
 </p>
@@ -257,24 +392,35 @@ x-media-controls::part(play-button) {
   <span class="hljs-attr">--x-icon-pause</span>: <span class="hljs-string">&quot;\f04c&quot;</span>;
   <span class="hljs-attr">--x-icon-mute</span>: <span class="hljs-string">&quot;\f6a9&quot;</span>;
   <span class="hljs-attr">--x-icon-unmute</span>: <span class="hljs-string">&quot;\f028&quot;</span>;
+  <span class="hljs-attr">--x-volume-slider-expand</span>: <span class="hljs-number">0</span>;
  
   <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.5rem</span>
 }
 
-<span class="hljs-comment">/*
-x-media-controls {
- --x-volume-slider-expand: 0;
+x-media-controls<span class="hljs-selector-pseudo">::part</span>(volume-control),
+x-media-controls<span class="hljs-selector-pseudo">::part</span>(play-<span class="hljs-selector-tag">button</span>) {
+  <span class="hljs-attribute">order</span>: -<span class="hljs-number">1</span>;
 }
 
-x-media-controls::part(volume-control),
-x-media-controls::part(play-button) {
-  order: -1;
+x-media-controls<span class="hljs-selector-pseudo">:not</span>(:<span class="hljs-built_in">state</span>(--fullscreen))::<span class="hljs-built_in">part</span>(controls-panel) {
+  <span class="hljs-attr">--x-controls-bg</span>: transparent;
+  <span class="hljs-attribute">opacity</span>: <span class="hljs-number">1</span>;
+  <span class="hljs-attribute">transform</span>: none;
+  <span class="hljs-attribute">pointer-events</span>: none;
+  <span class="hljs-attribute">mix-blend-mode</span>: overlay;
 }
-*/</span>
+
+x-media-controls<span class="hljs-selector-pseudo">:not</span>(:<span class="hljs-built_in">state</span>(--fullscreen))::<span class="hljs-built_in">part</span>(overlay-playbutton),
+x-media-controls:<span class="hljs-built_in">not</span>(:<span class="hljs-built_in">state</span>(--fullscreen))::<span class="hljs-built_in">part</span>(timeline),
+x-media-controls:<span class="hljs-built_in">not</span>(:<span class="hljs-built_in">state</span>(--fullscreen))::<span class="hljs-built_in">part</span>(current-time),
+x-media-controls:<span class="hljs-built_in">not</span>(:<span class="hljs-built_in">state</span>(--fullscreen))::<span class="hljs-built_in">part</span>(duration),
+x-media-controls:<span class="hljs-built_in">not</span>(:<span class="hljs-built_in">state</span>(--fullscreen))::<span class="hljs-built_in">part</span>(play-button) {
+  <span class="hljs-attribute">display</span>: none;
+}
 </code></pre>
 <p>Provide the actual markup</p>
 <pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">x-ambience</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">x-media-controls</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;media-controls&quot;</span> <span class="hljs-attr">controlslist</span>=<span class="hljs-string">&quot;notime noplay&quot;</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
       <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;width: 100%; height: auto;&quot;</span>
       <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
@@ -282,9 +428,23 @@ x-media-controls::part(play-button) {
       <span class="hljs-attr">loop</span>
       <span class="hljs-attr">onloadedmetadata</span>=<span class="hljs-string">&quot;//this.muted = true // Firefox won&#x27;t autplay when initially muted &quot;</span>
       <span class="hljs-attr">muted</span>
+      <span class="hljs-attr">autoplay</span>
     &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">x-media-controls</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">x-ambience</span>&gt;</span>
+</code></pre>
+<p>Show all controls in fullscreen</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> mc = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#media-controls&#x27;</span>);
+
+mc.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;fullscreenchange&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> isFullscreen = !!<span class="hljs-variable language_">document</span>.<span class="hljs-property">fullscreenElement</span>;
+
+  <span class="hljs-keyword">if</span> (!isFullscreen) {
+    mc.<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&#x27;controlslist&#x27;</span>, <span class="hljs-string">&#x27;notime noplay&#x27;</span>);
+  } <span class="hljs-keyword">else</span> {
+    mc.<span class="hljs-title function_">removeAttribute</span>(<span class="hljs-string">&#x27;controlslist&#x27;</span>);
+  }
+})
 </code></pre>
 
     </div>

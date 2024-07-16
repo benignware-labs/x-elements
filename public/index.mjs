@@ -639,14 +639,17 @@ var PanelManager = class {
 
 // lib/Ambience/Ambience.mjs
 var MEDIA_TAGS = ["IMG", "VIDEO"];
-function copyStyles(dest, src) {
+function copyStyles(dest, src, props = []) {
   const srcStyle = window.getComputedStyle(src);
   const destStyle = window.getComputedStyle(dest);
-  for (const property in srcStyle) {
-    const fresh = srcStyle.getPropertyValue(property);
-    const current = destStyle.getPropertyValue(property);
-    if (fresh !== current) {
-      return dest.style.setProperty(property, fresh);
+  for (let i = 0; i < srcStyle.length; i++) {
+    const property = srcStyle.item(i);
+    if (!props.length || props.includes(property)) {
+      const fresh = srcStyle.getPropertyValue(property);
+      const current = destStyle.getPropertyValue(property);
+      if (fresh !== current) {
+        dest.style.setProperty(property, fresh);
+      }
     }
   }
 }
@@ -669,22 +672,31 @@ var getScrollParent = (element, stop = null, values = ["scroll", "auto"]) => {
   return document.body;
 };
 var getScrollParents = (element, stop = null, values = ["scroll", "auto"]) => {
-  let parent = element;
+  stop = Array.isArray(stop) ? stop : [stop];
+  let parent = element.parentNode;
   const parents = [];
   while (parent) {
-    if (parent === document.body) {
-      return parents;
-    }
-    if (parent === stop) {
-      return parents;
-    }
     const style = window.getComputedStyle(parent);
     if (values.includes(style.overflow) || values.includes(style.overflowX) || values.includes(style.overflowY)) {
       parents.push(parent);
     }
+    if (parent === document.body || stop.includes(parent)) {
+      return parents;
+    }
     parent = parent.parentElement;
   }
   return parents;
+};
+var getScrollSize = (element) => {
+  let container = element;
+  if (element === document.body) {
+    container = document.documentElement;
+  }
+  const size = {
+    width: container.scrollWidth,
+    height: container.scrollHeight
+  };
+  return size;
 };
 var getPositioonFixedParent = (element) => {
   let parent = element;
@@ -715,6 +727,7 @@ var Ambience = class extends HTMLElement {
   #elementAnimations = /* @__PURE__ */ new WeakMap();
   #scrollParent = null;
   #backdrop;
+  #backdropBody;
   // Props
   #animated = false;
   #for = null;
@@ -736,8 +749,12 @@ var Ambience = class extends HTMLElement {
         /* Add your styling here */
         :host {
           display: contents;
-          --x-ambience-filter--default: contrast(1.3) blur(3.5rem) brightness(1.4);
+          --x-ambience-filter--default: contrast(1.3) blur(5.5rem) brightness(1.4) opacity(0.7);
           /*--x-ambience-filter--default: contrast(4) blur(3.5rem) brightness(2.7);*/
+          /*--x-ambience-filter--default: drop-shadow(0 0 0.75rem crimson);*/
+          /*--x-ambience-filter--default: none;*/
+          --x-ambience-filter--default: blur(3.5rem);
+          --x-ambience-scale--default: 1;
         }
 
         :host::part(backdrop) {
@@ -746,13 +763,13 @@ var Ambience = class extends HTMLElement {
           pointer-events: none;
         }
 
-        :host(:state(--clip))::part(backdrop) {
-          filter: var(--x-ambience-filter, blur(3.5rem));
-          overflow: hidden;
+        :host::part(backdrop-body) {
+          position: absolute;
         }
 
-        :host-context(html.x-ambience-scroll-measure)::part(backdrop) {
-          display: none;
+        :host-context(.x-ambience-scroll-measure)::part(backdrop) {
+          display: none !important;
+          transform: none !important;
         }
 
          /*:host::part(backdrop):after {
@@ -764,16 +781,8 @@ var Ambience = class extends HTMLElement {
           bottom: 0;
           z-index: 1000;
         }*/
-        
-        :host::part(backdrop-body) {
-          position: absolute;
-          transform: translate3d(0, 0, 0);
-          transform-style: preserve-3d;
-          width: 0;
-          height: 0;
-        }
 
-        * {
+        :host(*) {
           transform-style: preserve-3d;
           backface-visibility: hidden;
         }
@@ -781,17 +790,17 @@ var Ambience = class extends HTMLElement {
         :host::part(clip) {
           position: absolute;
           overflow: hidden;
-          
+          /* clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
         }
 
-         :host::part(clip) {
-            filter: var(--x-ambience-filter, var(--x-ambience-filter--default));
-         }
-
-        
-         :host::part(display) {
-         position: absolute;
+        .effect {
           filter: var(--x-ambience-filter, var(--x-ambience-filter--default));
+          /*scale: var(--x-ambience-scale, var(--x-ambience-scale--default));
+          scale: 1;*/
+        }
+
+        :host::part(display) {
+          position: absolute;
           opacity: 0;
           transition: opacity 0.125s;
           will-change: opacity;
@@ -800,21 +809,14 @@ var Ambience = class extends HTMLElement {
         :host::part(display ready) {
           opacity: 1;
         }
-
-         :host::part(clip) :host::part(display),
-         :host::part(clip) :host::part(clip) {
-          filter: none;
-        }
-
-        :host::part(body) {
-          position: relative;
-          transform: translate3d(0, 0, 0);
-        }
       </style>
-      <div part="backdrop"></div>
+      <div part="backdrop">
+        <div part="backdrop-body"></div>
+      </div>
       <slot></slot>
     `;
     this.#backdrop = this.shadowRoot.querySelector('[part="backdrop"]');
+    this.#backdropBody = this.shadowRoot.querySelector('[part="backdrop-body"]');
     this.#slot = this.shadowRoot.querySelector("slot");
   }
   isMediaElement(element) {
@@ -875,6 +877,7 @@ var Ambience = class extends HTMLElement {
       slot.appendChild(mediaDisplayElement);
     }
     this.#displayMediaElements.set(element, mediaDisplayElement);
+    this.updateMediaElementStyles(element);
     displayElement.classList.add("display");
     displayElement.setAttribute("part", "display");
     return displayElement;
@@ -890,19 +893,22 @@ var Ambience = class extends HTMLElement {
     const clippingDisplayElement = document.createElement("div");
     clippingDisplayElement.setAttribute("part", "clip");
     clippingDisplayElement.setAttribute("data-class", element.getAttribute("class"));
+    clippingDisplayElement.setAttribute("data-tag", element.tagName);
     return clippingDisplayElement;
   }
   mediaElementAdded(...element) {
+    const targetElements = [...this.#assignedChildren];
     element.forEach((element2) => {
       this.#mediaElements.add(element2);
-      const scrollParents = getScrollParents(element2, this, ["scroll", "auto", "hidden"]);
+      const scrollParents = getScrollParents(element2, targetElements, ["scroll", "auto", "hidden", "clip"]);
       scrollParents.reverse().forEach((scrollParent2, index, array) => {
         const parent = index > 0 ? array[index - 1] : null;
         if (!this.#clippingTargets.has(scrollParent2)) {
           this.#clippingTargets.add(scrollParent2);
           if (!this.#clippingDisplayElements.get(scrollParent2)) {
             const clippingDisplayElement = this.createClippingDisplayElement(scrollParent2);
-            const displayParent2 = this.#clippingDisplayElements.get(parent) || this.#backdrop;
+            clippingDisplayElement.classList.toggle("effect", !parent);
+            const displayParent2 = this.#clippingDisplayElements.get(parent) || this.#backdropBody;
             displayParent2.appendChild(clippingDisplayElement);
             this.#clippingDisplayElements.set(scrollParent2, clippingDisplayElement);
             this.#clippingParents.set(scrollParent2, parent);
@@ -911,8 +917,9 @@ var Ambience = class extends HTMLElement {
         }
       });
       const scrollParent = scrollParents.length ? scrollParents[scrollParents.length - 1] : null;
-      const displayParent = this.#clippingDisplayElements.get(scrollParent) || this.#backdrop;
+      const displayParent = this.#clippingDisplayElements.get(scrollParent) || this.#backdropBody;
       const displayElement = this.createDisplayElement(element2);
+      displayElement.classList.toggle("effect", !scrollParent);
       this.#displayElements.set(element2, displayElement);
       this.#clippingParents.set(element2, scrollParent);
       displayParent.appendChild(displayElement);
@@ -920,8 +927,6 @@ var Ambience = class extends HTMLElement {
       element2.addEventListener("load", this.handleLoad, { passive: true });
       element2.addEventListener("play", this.handlePlay, { passive: true });
       element2.addEventListener("pause", this.handlePause, { passive: true });
-      element2.addEventListener("pointerenter", this.handleStateChange, { passive: true });
-      element2.addEventListener("pointerleave", this.handleStateChange, { passive: true });
       if (element2 instanceof HTMLMediaElement) {
         const posterImage = displayElement.querySelector("img");
         if (posterImage) {
@@ -938,8 +943,6 @@ var Ambience = class extends HTMLElement {
       element2.removeEventListener("load", this.handleLoad);
       element2.removeEventListener("play", this.handlePlay);
       element2.removeEventListener("pause", this.handlePause);
-      element2.removeEventListener("pointerenter", this.handleStateChange);
-      element2.removeEventListener("pointerleave", this.handleStateChange);
       const displayElement = this.#displayElements.get(element2);
       if (element2 instanceof HTMLMediaElement) {
         const posterImage = displayElement.querySelector("img");
@@ -968,6 +971,10 @@ var Ambience = class extends HTMLElement {
       element.addEventListener("transitionstart", this.handlePlay, { passive: true });
       element.addEventListener("animationend", this.handlePause, { passive: true });
       element.addEventListener("transitionend", this.handlePause, { passive: true });
+      element.addEventListener("click", this.handleStateChange, { passive: true });
+      element.addEventListener("pointerover", this.handleStateChange, { passive: true });
+      element.addEventListener("pointerenter", this.handleStateChange, { passive: true });
+      element.addEventListener("pointerleave", this.handleStateChange, { passive: true });
       const nodes = [...element.querySelectorAll(MEDIA_TAGS.join(", "))];
       if (MEDIA_TAGS.includes(element.nodeName)) {
         nodes.push(element);
@@ -986,6 +993,10 @@ var Ambience = class extends HTMLElement {
       element.removeEventListener("transitionstart", this.handlePlay);
       element.removeEventListener("animationend", this.handlePause);
       element.removeEventListener("transitionend", this.handlePause);
+      element.removeEventListener("click", this.handleStateChange);
+      element.removeEventListener("pointerover", this.handleStateChange);
+      element.removeEventListener("pointerenter", this.handleStateChange);
+      element.removeEventListener("pointerleave", this.handleStateChange);
       this.#assignedChildren.delete(element);
       if (MEDIA_TAGS.includes(element.nodeName)) {
         removedMediaElements.push(element);
@@ -1020,8 +1031,10 @@ var Ambience = class extends HTMLElement {
     });
   }
   handleStateChange(event) {
-    const element = event.target;
-    this.updateMediaElement(element);
+    if (this.#mediaElements.has(event.target)) {
+      this.updateMediaElementStyles(event.target);
+    }
+    this.render();
   }
   startAnimation(element, id) {
     let elementAnimations;
@@ -1090,75 +1103,25 @@ var Ambience = class extends HTMLElement {
     window.addEventListener("resize", this.handleResize, { passive: true });
     this.#slot.addEventListener("slotchange", this.handleSlotChange);
     this.#scrollParent = getScrollParent(this);
+    const scrollTarget = this.#scrollParent === document.body ? window : this.#scrollParent;
+    scrollTarget.addEventListener("scroll", this.handleScroll, { passive: true });
     this.render();
   }
   detachedCallback() {
     window.removeEventListener("resize", this.handleResize);
     this.#slot.removeEventListener("slotchange", this.handleSlotChange);
+    const scrollTarget = this.#scrollParent === document.body ? window : this.#scrollParent;
+    scrollTarget.removeEventListener("scroll", this.handleScroll);
     this.#scrollParent = null;
   }
   mediaElementsChanged() {
     this.render();
   }
   targetElementsChanged() {
-    const targetElements = [...this.#assignedChildren];
-    let isClipping = true;
-    const hasOnlyMediaElements = targetElements.every((element) => MEDIA_TAGS.includes(element.nodeName));
-    if (!hasOnlyMediaElements) {
-      isClipping = false;
-    } else {
-      const clippingTargets = this.getClippingTargets();
-      if (clippingTargets.size === 0) {
-        isClipping = false;
-      }
-    }
     this.render();
   }
-  getClippingTargets() {
-    const clippingTargets = /* @__PURE__ */ new Set();
-    const mediaElements = [...this.#mediaElements];
-    for (const element of mediaElements) {
-      const scrollParent = getScrollParent(element);
-      if (scrollParent && scrollParent !== this.#scrollParent) {
-        clippingTargets.add(scrollParent);
-      }
-    }
-    return clippingTargets;
-  }
-  get isClipping() {
-    return this.#internals.states.has("--clip");
-  }
-  get clipArea() {
-    let bounds = [...this.#assignedChildren].reduce((bounds2, element) => {
-      const elementBounds = element.getBoundingClientRect();
-      bounds2.top = Math.min(bounds2.top, elementBounds.top);
-      bounds2.left = Math.min(bounds2.left, elementBounds.left);
-      bounds2.bottom = Math.max(bounds2.bottom, elementBounds.bottom);
-      bounds2.right = Math.max(bounds2.right, elementBounds.right);
-      return bounds2;
-    }, {
-      top: Infinity,
-      left: Infinity,
-      bottom: -Infinity,
-      right: -Infinity
-    });
-    bounds = {
-      top: Math.round(bounds.top),
-      left: Math.round(bounds.left),
-      width: Math.round(bounds.right - bounds.left),
-      height: Math.round(bounds.bottom - bounds.top),
-      right: Math.round(bounds.right),
-      bottom: Math.round(bounds.bottom)
-    };
-    const targetBounds = this.#backdrop.getBoundingClientRect();
-    bounds.top -= targetBounds.top;
-    bounds.left -= targetBounds.left;
-    bounds.bottom -= targetBounds.top;
-    bounds.right -= targetBounds.left;
-    return bounds;
-  }
   getZIndex() {
-    const computedStyle = window.getComputedStyle(this.#backdrop);
+    const computedStyle = window.getComputedStyle(this.#backdropBody);
     let zIndex = computedStyle.getPropertyValue("--x-ambience-z-index");
     if (!zIndex || zIndex === "auto") {
       zIndex = !!getPositioonFixedParent(this) ? "" : -1;
@@ -1170,12 +1133,17 @@ var Ambience = class extends HTMLElement {
     if (!clippingDisplayElement) {
       return;
     }
-    const parent = this.#clippingParents.get(element) || this.#backdrop;
+    const clippingParent = this.#clippingParents.get(element);
+    const parent = clippingParent || this.#backdropBody;
     const clippingArea = element.getBoundingClientRect();
     const targetBounds = parent.getBoundingClientRect();
-    clippingDisplayElement.style.setProperty("transform", `translate3d(${clippingArea.left - targetBounds.left}px, ${clippingArea.top - targetBounds.top}px, 0)`);
-    clippingDisplayElement.style.setProperty("width", `${clippingArea.width}px`);
-    clippingDisplayElement.style.setProperty("height", `${clippingArea.height}px`);
+    const style = clippingDisplayElement.style;
+    const left = clippingArea.left - targetBounds.left;
+    const top = clippingArea.top - targetBounds.top;
+    const scale = "";
+    style.setProperty("transform", `${scale}  translate3d(${left}px, ${top}px, 0) `);
+    style.setProperty("width", `${clippingArea.width}px`);
+    style.setProperty("height", `${clippingArea.height}px`);
   }
   updateClippingDisplayElements() {
     for (const element of this.#clippingTargets) {
@@ -1196,20 +1164,61 @@ var Ambience = class extends HTMLElement {
     }
     return true;
   }
+  updateMediaElementStyles(element) {
+    const mediaDisplayElement = this.#displayMediaElements.get(element);
+    if (!mediaDisplayElement) {
+      return;
+    }
+    copyStyles(mediaDisplayElement, element, [
+      "object-fit",
+      "object-position",
+      "filter",
+      "transform",
+      "transform-origin",
+      "transform-style",
+      "opacity",
+      "position",
+      // 'top',
+      // 'left',
+      // 'right',
+      // 'bottom',
+      "clip-path"
+    ]);
+  }
   updateMediaElement(element) {
     const displayElement = this.#displayElements.get(element);
     if (!displayElement) {
       return;
     }
-    const targetParent = this.#clippingParents.get(element) || this.#backdrop;
+    const clippingParent = this.#clippingParents.get(element);
+    const targetParent = clippingParent || this.#backdropBody;
     const targetBounds = targetParent.getBoundingClientRect();
     const elementBounds = element.getBoundingClientRect();
     const top = elementBounds.top - targetBounds.top;
     const left = elementBounds.left - targetBounds.left;
-    displayElement.style.setProperty("transform", `translate3d(${left}px, ${top}px, 0)`);
+    const scale = "  scale(var(--x-ambience-scale, var(--x-ambience-scale--default)))";
+    const isRenderedBefore = displayElement.style.transform !== "";
+    if (!isRenderedBefore || elementBounds.width > 0 && elementBounds.height > 0) {
+      displayElement.style.setProperty("transform", `translate3d(${left}px, ${top}px, 0) ${scale} `);
+      displayElement.style.setProperty("width", `${elementBounds.width}px`);
+      displayElement.style.setProperty("height", `${elementBounds.height}px`);
+      displayElement.style.setProperty("opacity", 1);
+      displayElement.style.setProperty("display", "");
+    } else if (isRenderedBefore) {
+      displayElement.style.setProperty("opacity", 0);
+      displayElement.style.setProperty("display", "");
+    } else {
+      displayElement.style.setProperty("display", "none");
+    }
+    displayElement.style.setProperty("width", `${elementBounds.width}px`);
+    displayElement.style.setProperty("height", `${elementBounds.height}px`);
     displayElement.setAttribute("part", this.isElementReady(element) ? "display ready" : "display");
     const mediaDisplayElement = this.#displayMediaElements.get(element);
-    copyStyles(mediaDisplayElement, element);
+    mediaDisplayElement.style.setProperty("visibility", window.getComputedStyle(element).visibility);
+    mediaDisplayElement.style.setProperty("position", "absolute");
+    mediaDisplayElement.style.setProperty("top", "0");
+    mediaDisplayElement.style.setProperty("bottom", "0");
+    mediaDisplayElement.style.setProperty("transition-duration", "0s");
     mediaDisplayElement.style.setProperty("width", `${elementBounds.width}px`);
     mediaDisplayElement.style.setProperty("height", `${elementBounds.height}px`);
     if (element instanceof HTMLMediaElement) {
@@ -1218,6 +1227,7 @@ var Ambience = class extends HTMLElement {
       const isPoster = element.poster && element.played.length === 0;
       poster.style.setProperty("width", `${elementBounds.width}px`);
       poster.style.setProperty("height", `${elementBounds.height}px`);
+      poster.style.setProperty("object-fit", "cover");
       poster.style.setProperty("display", isPoster ? "block" : "none");
       if (!isPoster) {
         canvas.width = elementBounds.width;
@@ -1231,6 +1241,32 @@ var Ambience = class extends HTMLElement {
     for (const element of this.#mediaElements) {
       this.updateMediaElement(element);
     }
+  }
+  clipToParent() {
+    const scrollParent = this.#scrollParent;
+    const backdrop = this.#backdrop;
+    const backdropBody = this.#backdropBody;
+    backdrop.style.transform = ``;
+    backdrop.style.width = ``;
+    backdrop.style.height = ``;
+    const targetBounds = backdrop.getBoundingClientRect();
+    scrollParent.classList.add("x-ambience-scroll-measure");
+    const scrollBounds = scrollParent.getBoundingClientRect();
+    const relScrollBounds = {
+      top: scrollBounds.top - targetBounds.top,
+      left: scrollBounds.left - targetBounds.left,
+      right: scrollBounds.right - targetBounds.left,
+      bottom: scrollBounds.bottom - targetBounds.top
+    };
+    let { left, top } = relScrollBounds;
+    let { width, height } = getScrollSize(scrollParent);
+    backdrop.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+    backdrop.style.width = `${width}px`;
+    backdrop.style.height = `${height}px`;
+    backdrop.style.overflow = "hidden";
+    backdrop.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+    backdropBody.style.transform = `translate3d(${-left}px, ${-top}px, 0)`;
+    scrollParent.classList.remove("x-ambience-scroll-measure");
   }
   render() {
     if (!this.isConnected || !this.parentNode) {
@@ -1283,6 +1319,52 @@ if (!customElements.get("x-ambience")) {
 }
 var Ambience_default = Ambience;
 
+// lib/MediaControls/MediaControlsList.mjs
+var isEqualSets = (set1, set2) => {
+  if (set1.size !== set2.size) {
+    return false;
+  }
+  for (const item of set1) {
+    if (!set2.has(item)) {
+      return false;
+    }
+  }
+  return true;
+};
+var cloneSet = (set) => /* @__PURE__ */ new Set([...set]);
+var MediaControlsList = class extends Set {
+  #callback;
+  constructor(callback = () => {
+  }) {
+    super();
+    this.#callback = callback;
+  }
+  add(value) {
+    const before = cloneSet(this);
+    value?.split(/\s+/).forEach((value2) => super.add(value2));
+    if (!isEqualSets(before, this)) {
+      this.#callback();
+    }
+  }
+  delete(value) {
+    const before = cloneSet(this);
+    value?.split(/\s+/).forEach((value2) => super.delete(value2));
+    if (!isEqualSets(before, this)) {
+      this.#callback();
+    }
+  }
+  clear() {
+    const before = cloneSet(this);
+    super.clear();
+    if (!isEqualSets(before, this)) {
+      this.#callback();
+    }
+  }
+  toString() {
+    return Array.from(this).join(" ");
+  }
+};
+
 // lib/MediaControls/MediaControls.mjs
 var formatCurrentTime = (time, duration) => {
   const minutes = Math.floor(time / 60);
@@ -1293,13 +1375,18 @@ var MediaControls = class _MediaControls extends HTMLElement {
   #internals;
   #slot;
   #mediaElement;
-  #timeoutId;
+  #clickTimeout;
+  #autohideTimeout;
+  #body;
+  #controlsPanel;
   #timeline;
   #volumeSlider;
   #currentTimeDisplay;
   #durationDisplay;
   #overlayPlayButton;
   #volume;
+  #controlslist = null;
+  #for;
   static CONTROLS_TIMEOUT = 3e3;
   constructor() {
     super();
@@ -1317,15 +1404,18 @@ var MediaControls = class _MediaControls extends HTMLElement {
     this.handlePointerLeave = this.handlePointerLeave.bind(this);
     this.handleLoadedData = this.handleLoadedData.bind(this);
     this.handleCanPlay = this.handleCanPlay.bind(this);
+    this.handleResize = this.handleResize.bind(this);
+    this.handleControlsListChange = this.handleControlsListChange.bind(this);
     this.update = this.update.bind(this);
     this.attachShadow({ mode: "open" });
     this.#internals = this.attachInternals();
+    this.#controlslist = new MediaControlsList(this.handleControlsListChange);
     const html = `
       <style>
         :host {
           display: inline-flex;
           position: relative;
-          overflow: hidden;
+          /*overflow: hidden;*/
           font-family: var(--x-font-family, sans-serif);
           font-size: var(--x-font-size, 0.9rem);
         }
@@ -1335,31 +1425,56 @@ var MediaControls = class _MediaControls extends HTMLElement {
           outline: 2px solid yellow;*/
         }
 
+        :host([for]) {
+          display: block;
+          overflow: visible;
+        }
+
+        :host::part(body) {
+          /*outline: 2px solid yellow;*/
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
         /* controls panel */
         :host::part(controls-panel) {
+          pointer-events: auto;
           position: absolute;
           left: 0;
           right: 0;
           bottom: 0;
           background: var(--x-controls-bg, color-mix(in srgb, black 45%, transparent));
           transform: translateY(100%);
-          transition: all 0.3s ease-in;
           transition-delay: 0s;
           opacity: 0;
           padding: var(--x-controls-padding-y, 0.5rem) var(--x-controls-padding-x, 0.5rem);
-          
           display: flex;
           justify-content: start;
           align-items: center;
-          gap: var(--x-controls-gap, 1rem);
+          gap: var(--x-controls-gap, 0.5rem);
+        }
+
+        :host(:state(--nocontrols))::part(controls-panel) {
+          display: none;
+        }
+
+        :host(:state(--animated))::part(controls-panel) {
+          transition: transform 0.3s ease-in, opacity 0.3s ease-in;
         }
 
         :host(:state(--paused))::part(controls-panel) {
         }
 
+        :host(:state(--fullscreen))::part(controls-panel) {
+        }
+
         :host(:state(--controlsvisible))::part(controls-panel) {
           transform: translateY(0);
-          transition-duration: 0.1s;
           transition-delay: 0.1s;
           opacity: 1;
         }
@@ -1374,6 +1489,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
           width: max-content;
           flex-grow: 1;
           flex-shrink: 1;
+          pointer-events: auto;
         }
 
         :host::part(timeline) {
@@ -1391,7 +1507,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
             height: var(--x-slider-height, 0.5rem);
             cursor: pointer;
             box-shadow: var(--x-slider-shadow, inset 0 1px 2px color-mix(in srgb, black 5%, transparent));
-            background: var(--x-slider-bg, color-mix(in srgb, currentColor 50%, transparent));
+            background: var(--x-slider-bg, color-mix(in srgb, var(--x-controls-color, #fff) 50%, transparent));
             border-radius: var(--x-slider-radius, 0.5rem);
             border-width: var(--x-slider-border-width, 0);
             border-style: var(--x-slider-border-style, solid);
@@ -1414,7 +1530,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
             width: var(--x-slider-thumb-width, 0.5rem); 
             height: var(--x-slider-thumb-height, 0.5rem);
             border-radius: 50%;
-            background: currentColor;
+            background: var(--x-controls-color, #fff);
             cursor: pointer;
             margin-top: calc((var(--x-slider-height, 0.5rem) - var(--x-slider-thumb-height, 0.5rem)) / 2);
           }
@@ -1430,10 +1546,11 @@ var MediaControls = class _MediaControls extends HTMLElement {
           height: 1rem;
           box-sizing: content-box;
           cursor: pointer;
+          pointer-events: auto;
         }
 
         :host::part(control-button):before,
-        :host::part(overlay-play-button):before,
+        :host::part(overlay-playbutton):before,
         :host::part(control-button):after {
           font-family: var(--x-icon-font-family, monospace);
           font-weight: var(--x-icon-font-weight, normal);
@@ -1501,7 +1618,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
 
         /* duration-display */
         :host::part(duration) {
-          color: var(--x-muted, color-mix(in srgb, currentColor 50%, transparent));
+          color: var(--x-muted, color-mix(in srgb, var(--x-controls-color, #fff) 50%, transparent));
         }
 
         :host::part(duration)::before {
@@ -1521,7 +1638,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
         }
 
         /* overlay play button */
-        :host::part(overlay-play-button) {
+        :host::part(overlay-playbutton) {
           position: absolute;
           top: 50%;
           left: 50%;
@@ -1545,19 +1662,19 @@ var MediaControls = class _MediaControls extends HTMLElement {
           height: 1em;
         }
 
-        :host::part(overlay-play-button)::before {
+        :host::part(overlay-playbutton)::before {
           content: var(--x-icon-play, "\u25B6");
           display: block;
           vertical-align: middle;
         }
 
-        :host(:state(--canplay):state(--paused):not(:state(--played)))::part(overlay-play-button) {
+        :host(:state(--canplay):state(--paused):not(:state(--played)))::part(overlay-playbutton) {
           opacity: 1;
           transform: translate(-50%, -50%) scale(1);
           visibility: visible;
         }
 
-        :host(:state(--played))::part(overlay-play-button) {
+        :host(:state(--played))::part(overlay-playbutton) {
           opacity: 0;
           transform: translate(-50%, -50%) scale(2.5);
           transition: visibility 0s 0.4s, opacity 0.4s ease-out, transform 0.4s ease-in;
@@ -1572,9 +1689,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
           align-items: center;
           position: relative;
           margin-right: 0;
-        }
-
-        .volume-control:hover {
+          pointer-events: auto;
         }
 
         :host::part(volume-slider) {
@@ -1592,7 +1707,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
             0 * (1 - var(--x-volume-slider-expand, 1))
           );;
           padding-left: calc(
-            0.75rem * var(--x-volume-slider-expand, 1) +
+            0.5rem * var(--x-volume-slider-expand, 1) +
             0rem * (1 - var(--x-volume-slider-expand, 1))
           );
         } 
@@ -1600,49 +1715,131 @@ var MediaControls = class _MediaControls extends HTMLElement {
         .volume-control:hover > input[type=range] {
           opacity: 1;
           max-width: 5rem;
-          padding-left: 0.75rem;
+          padding-left: 0.5rem;
         }
 
         /* controlslist */
+        /*
         :host([controlslist*="nofullscreen"])::part(fullscreen-button),
-        :host([controlslist*="noplay"])::part(play-button),
-        :host([controlslist*="nomute"])::part(mute-button),
+        :host([controlslist*="nooverlayplaybutton"])::part(overlay-playbutton),
+        :host([controlslist*="noplaybutton"])::part(play-button),
+        :host([controlslist*="nomutebutton"])::part(mute-button),
         :host([controlslist*="notimeline"])::part(timeline),
+        :host([controlslist*="noduration"])::part(duration),
+        :host([controlslist*="nocurrenttime"])::part(current-time),
         :host([controlslist*="novolumeslider"])::part(volume-slider) {
+          display: none;
+        }
+          */
+
+        :host(:where(
+          [controlslist^="noplaybutton"],
+          [controlslist*=" noplaybutton "],
+          [controlslist$="noplaybutton"],
+          [controlslist^="noplay"],
+          [controlslist*=" noplay "],
+          [controlslist$="noplay"],
+        ))::part(play-button),
+        
+        :host(:where(
+          [controlslist^="nooverlayplaybutton"],
+          [controlslist*=" nooverlayplaybutton "],
+          [controlslist$="nooverlayplaybutton"],
+          [controlslist^="noplay"],
+          [controlslist*=" noplay "],
+          [controlslist$="noplay"],
+        ))::part(overlay-playbutton),
+
+        :host(:where(
+          [controlslist^="nofullscreenbutton"],
+          [controlslist*=" nofullscreenbutton "],
+          [controlslist$="nofullscreenbutton"],
+          [controlslist^="nofullscreen"],
+          [controlslist*=" nofullscreen "],
+          [controlslist$="nofullscreen"],
+        ))::part(fullscreen-button),
+
+        :host(:where(
+          [controlslist^="nomutebutton"],
+          [controlslist*=" nomutebutton "],
+          [controlslist$="nomutebutton"],
+          [controlslist^="novolume"],
+          [controlslist*=" novolume "],
+          [controlslist$="novolume"],
+        ))::part(mute-button),
+
+        :host(:where(
+          [controlslist^="novolumeslider"],
+          [controlslist*=" novolumeslider "],
+          [controlslist$="novolumeslider"],
+          [controlslist^="novolume"],
+          [controlslist*=" novolume "],
+          [controlslist$="novolume"],
+        ))::part(volume-slider),
+
+        :host(:where(
+          [controlslist^="nocurrenttime"],
+          [controlslist*=" nocurrenttime "],
+          [controlslist$="nocurrenttime"],
+          [controlslist^="notime"],
+          [controlslist*=" notime "],
+          [controlslist$="notime"],
+        ))::part(current-time),
+
+        :host(:where(
+          [controlslist^="noduration"],
+          [controlslist*=" noduration "],
+          [controlslist$="noduration"],
+          [controlslist^="notime"],
+          [controlslist*=" notime "],
+          [controlslist$="notime"],
+        ))::part(duration),
+
+        :host(:where(
+          [controlslist^="notimeline"],
+          [controlslist*=" notimeline "],
+          [controlslist$="notimeline"],
+          [controlslist^="notime"],
+          [controlslist*=" notime "],
+          [controlslist$="notime"],
+        ))::part(timeline)
+        
+        {
           display: none;
         }
       </style>
       
       <slot></slot>
-      <div part="controls-panel">
-        <div part="control-button play-button"></div>
-        
-        <input part="slider timeline" type="range"/>
-        <div part="time-display">
+      <div part="body">
+        <div part="controls-panel">
+          <div part="control-button play-button"></div>
+          
+          <input part="slider timeline" type="range"/>
           <div part="display current-time">0:00</div>
           <div part="display duration">0:00</div>
-        </div>
 
-        <div part="volume-control" class="volume-control">
-          <div part="control-button mute-button"></div>
-          <input part="slider volume-slider" type="range"/>
+          <div class="volume-control">
+            <div part="control-button mute-button"></div>
+            <input part="slider volume-slider" type="range"/>
+          </div>
+          
+          <div part="control-button fullscreen-button"></div>
         </div>
-        
-        <div part="control-button fullscreen-button"></div>
+        <div part="overlay-playbutton"></div>
       </div>
-      <div part="overlay-play-button"></div>
     `;
     this.shadowRoot.innerHTML = html;
     this.#slot = this.shadowRoot.querySelector("slot");
+    this.#body = this.shadowRoot.querySelector('[part*="body"]');
     this.#timeline = this.shadowRoot.querySelector('[part*="timeline"]');
     this.#currentTimeDisplay = this.shadowRoot.querySelector('[part*="current-time"]');
     this.#durationDisplay = this.shadowRoot.querySelector('[part*="duration"]');
     this.#volumeSlider = this.shadowRoot.querySelector('[part*="volume-slider"]');
     this.#volumeSlider.value = 100;
+    this.#controlsPanel = this.shadowRoot.querySelector('[part*="controls-panel"]');
   }
-  handleSlotChange(event) {
-    const mediaElement = event.target.assignedElements().find((element) => element instanceof HTMLMediaElement);
-    if (mediaElement !== this.#mediaElement) {
+  set mediaElement(value) {
+    if (value !== this.#mediaElement) {
       if (this.#mediaElement) {
         this.#mediaElement.removeEventListener("loadeddata", this.handleLoadedData);
         this.#mediaElement.removeEventListener("canplay", this.handleCanPlay);
@@ -1652,7 +1849,7 @@ var MediaControls = class _MediaControls extends HTMLElement {
         this.#mediaElement.removeEventListener("durationchange", this.handleTimeUpdate);
         this.#mediaElement.removeEventListener("volumechange", this.handleVolumeChange);
       }
-      this.#mediaElement = mediaElement;
+      this.#mediaElement = value;
       if (this.#mediaElement) {
         this.#mediaElement.addEventListener("loadeddata", this.handleLoadedData);
         this.#mediaElement.addEventListener("canplay", this.handleCanPlay);
@@ -1661,10 +1858,31 @@ var MediaControls = class _MediaControls extends HTMLElement {
         this.#mediaElement.addEventListener("timeupdate", this.handleTimeUpdate);
         this.#mediaElement.addEventListener("durationchange", this.handleTimeUpdate);
         this.#mediaElement.addEventListener("volumechange", this.handleVolumeChange);
-        this.#mediaElement.paused ? this.showControls() : this.hideControls(0);
         this.#mediaElement.muted ? this.#internals.states.add("--muted") : this.#internals.states.delete("--muted");
         this.#volumeSlider.value = this.#mediaElement.muted ? 0 : this.#mediaElement.volume * 100;
+        if (this.#mediaElement.readyState === 0 && this.#mediaElement.autoplay || !this.#mediaElement.paused) {
+          this.hideControls(0);
+        } else {
+          this.showControls();
+        }
+        if (this.#mediaElement.readyState >= 2) {
+          this.#timeline.max = 100;
+          this.#internals.states.add("--loadeddata");
+          if (this.#mediaElement.readyState >= 3) {
+            this.#internals.states.add("--canplay");
+          }
+        }
       }
+    }
+    this.update();
+  }
+  get mediaElement() {
+    return this.#mediaElement;
+  }
+  handleSlotChange(event) {
+    const mediaElement = event.target.assignedElements().find((element) => element instanceof HTMLMediaElement);
+    if (mediaElement) {
+      this.mediaElement = mediaElement;
     }
     this.update();
   }
@@ -1679,7 +1897,38 @@ var MediaControls = class _MediaControls extends HTMLElement {
       document.exitFullscreen();
     }
   }
+  handleResize() {
+    this.update();
+  }
   handleClick(event) {
+    const isControlsPanel = !!event.target.closest('[part*="controls-panel"]');
+    if (isControlsPanel) {
+      const playButton = event.target.closest('[part*="play-button"]');
+      if (playButton) {
+        this.#mediaElement.paused ? this.#mediaElement.play() : this.#mediaElement.pause();
+      }
+      const muteButton = event.target.closest('[part*="mute-button"]');
+      if (muteButton) {
+        this.#mediaElement.muted = !this.#mediaElement.muted;
+      }
+      const fullscreenButton = event.target.closest('[part*="fullscreen-button"]');
+      if (fullscreenButton) {
+        this.toggleFullscreen();
+      }
+      return;
+    }
+    const noPlay = this.controlslist.has("noplay");
+    if (noPlay) {
+      return;
+    }
+    clearTimeout(this.#clickTimeout);
+    if (event.detail === 1) {
+      this.#clickTimeout = setTimeout(() => {
+        this.handleSingleClick(event);
+      }, 200);
+    }
+  }
+  handleSingleClick(event) {
     if (!this.#mediaElement) {
       return;
     }
@@ -1688,26 +1937,16 @@ var MediaControls = class _MediaControls extends HTMLElement {
       this.#mediaElement.paused ? this.#mediaElement.play() : this.#mediaElement.pause();
       return;
     }
-    const playButton = event.target.closest('[part*="play-button"]');
-    if (playButton) {
-      this.#mediaElement.paused ? this.#mediaElement.play() : this.#mediaElement.pause();
-    }
-    const muteButton = event.target.closest('[part*="mute-button"]');
-    if (muteButton) {
-      console.log("muteButton", muteButton, this.#mediaElement.muted);
-      this.#mediaElement.muted = !this.#mediaElement.muted;
-    }
-    const fullscreenButton = event.target.closest('[part*="fullscreen-button"]');
-    if (fullscreenButton) {
-      this.toggleFullscreen();
-    }
   }
-  handlePlay(event) {
-    this.#internals.states.add("--played");
+  handlePlay() {
+    if (this.#mediaElement.played.length > 0) {
+      this.#internals.states.add("--played");
+      this.#internals.states.add("--animated");
+    }
     this.hideControls();
     this.update();
   }
-  handlePause(event) {
+  handlePause() {
     this.showControls();
     this.update();
   }
@@ -1721,10 +1960,16 @@ var MediaControls = class _MediaControls extends HTMLElement {
       this.#internals.states.delete("--muted");
     }
   }
-  handleFullscreenChange(event) {
+  handleFullscreenChange() {
     window.requestAnimationFrame(() => {
-      this.update();
     });
+    const isAnimated = this.#internals.states.has("--animated");
+    this.#internals.states.delete("--animated");
+    this.update();
+    this.handleControlsListChange();
+    if (isAnimated) {
+      this.#internals.states.add("--animated");
+    }
   }
   handleTimelineChange(event) {
     if (!this.#mediaElement) {
@@ -1749,8 +1994,8 @@ var MediaControls = class _MediaControls extends HTMLElement {
     this.toggleFullscreen();
   }
   handlePointerMove(event) {
-    if (this.#timeoutId) {
-      clearTimeout(this.#timeoutId);
+    if (this.#autohideTimeout) {
+      clearTimeout(this.#autohideTimeout);
     }
     this.#internals.states.add("--controlsvisible");
     if (this.#mediaElement.paused) {
@@ -1761,13 +2006,13 @@ var MediaControls = class _MediaControls extends HTMLElement {
     if (isControls) {
       return;
     }
-    this.#timeoutId = setTimeout(() => {
+    this.#autohideTimeout = setTimeout(() => {
       this.#internals.states.delete("--controlsvisible");
     }, _MediaControls.CONTROLS_TIMEOUT);
   }
   handlePointerLeave(event) {
-    if (this.#timeoutId) {
-      clearTimeout(this.#timeoutId);
+    if (this.#autohideTimeout) {
+      clearTimeout(this.#autohideTimeout);
     }
     if (this.#mediaElement.paused) {
       return;
@@ -1792,39 +2037,70 @@ var MediaControls = class _MediaControls extends HTMLElement {
     this.#currentTimeDisplay.textContent = formatCurrentTime(this.#mediaElement.currentTime, this.#mediaElement.duration);
     this.#durationDisplay.textContent = formatCurrentTime(this.#mediaElement.duration);
   }
+  handleControlsListChange() {
+    const controls = this.shadowRoot.querySelectorAll('[part="controls-panel"] *[part]');
+    const hasVisibleControls = Array.from(controls).some((control) => getComputedStyle(control).display !== "none");
+    if (!hasVisibleControls) {
+      this.#internals.states.add("--nocontrols");
+    } else {
+      this.#internals.states.delete("--nocontrols");
+    }
+    if (!this.#mediaElement) {
+      return;
+    }
+    if (this.controlslist.has("noplay")) {
+      const isPlaying = this.#mediaElement.hasAttribute("autoplay");
+      if (isPlaying) {
+        this.#mediaElement.play();
+      } else {
+        this.#mediaElement.pause();
+      }
+    }
+    if (this.controlslist.has("novolume") || this.controlslist.has("nomutebutton") && this.controlslist.has("novolumeslider")) {
+      const isMuted = this.#mediaElement.hasAttribute("muted");
+      this.#mediaElement.muted = isMuted;
+    }
+  }
   connectedCallback() {
+    window.addEventListener("resize", this.handleResize);
+    document.addEventListener("fullscreenchange", this.handleFullscreenChange);
     this.#slot.addEventListener("slotchange", this.handleSlotChange);
     this.shadowRoot.addEventListener("click", this.handleClick);
     this.shadowRoot.addEventListener("dblclick", this.handleDblClick);
     this.addEventListener("pointermove", this.handlePointerMove);
     this.addEventListener("pointerleave", this.handlePointerLeave);
-    document.addEventListener("fullscreenchange", this.handleFullscreenChange);
     this.#timeline.addEventListener("change", this.handleTimelineChange);
     this.#volumeSlider.addEventListener("change", this.handleVolumeSliderChange);
+    this.update();
   }
   detachedCallback() {
+    window.removeEventListener("resize", this.handleResize);
+    document.removeEventListener("fullscreenchange", this.handleFullscreenChange);
     this.#slot.addEventListener("slotchange", this.handleSlotChange);
     this.shadowRoot.removeEventListener("click", this.handleClick);
     this.shadowRoot.removeEventListener("dblclick", this.handleDblClick);
     this.removeEventListener("pointermove", this.handlePointerMove);
     this.removeEventListener("pointerleave", this.handlePointerLeave);
-    document.removeEventListener("fullscreenchange", this.handleFullscreenChange);
     this.#timeline.removeEventListener("change", this.handleTimelineChange);
     this.#volumeSlider.removeEventListener("change", this.handleVolumeSliderChange);
   }
   hideControls(timeout = _MediaControls.CONTROLS_TIMEOUT) {
-    if (this.#timeoutId) {
-      clearTimeout(this.#timeoutId);
+    if (this.#autohideTimeout) {
+      clearTimeout(this.#autohideTimeout);
     }
-    this.#timeoutId = setTimeout(() => {
+    if (_MediaControls.CONTROLS_TIMEOUT === 0) {
+      this.#internals.states.delete("--controlsvisible");
+      return;
+    }
+    this.#autohideTimeout = setTimeout(() => {
       if (!this.#mediaElement.paused) {
         this.#internals.states.delete("--controlsvisible");
       }
     }, timeout);
   }
   showControls() {
-    if (this.#timeoutId) {
-      clearTimeout(this.#timeoutId);
+    if (this.#autohideTimeout) {
+      clearTimeout(this.#autohideTimeout);
     }
     this.#internals.states.add("--controlsvisible");
   }
@@ -1833,21 +2109,67 @@ var MediaControls = class _MediaControls extends HTMLElement {
       return;
     }
     const isPaused = this.#mediaElement.paused;
-    const isPlayed = this.#mediaElement.played.length > 0;
     const isFullscreen = document.fullscreenElement === this || document.fullscreenElement?.contains(this);
     if (isPaused) {
       this.#internals.states.add("--paused");
     } else {
       this.#internals.states.delete("--paused");
     }
-    if (isPlayed) {
-      this.#internals.states.add("--played");
-    } else {
-    }
     if (isFullscreen) {
       this.#internals.states.add("--fullscreen");
     } else {
       this.#internals.states.delete("--fullscreen");
+    }
+    const style = getComputedStyle(this.#mediaElement);
+    this.#body.style.setProperty("border-top-left-radius", style.getPropertyValue("border-top-left-radius"));
+    this.#body.style.setProperty("border-top-right-radius", style.getPropertyValue("border-top-right-radius"));
+    this.#body.style.setProperty("border-bottom-left-radius", style.getPropertyValue("border-bottom-left-radius"));
+    this.#body.style.setProperty("border-bottom-right-radius", style.getPropertyValue("border-bottom-right-radius"));
+    if (this.#for) {
+      const mediaElementBounds = this.#mediaElement.getBoundingClientRect();
+      this.#body.style.setProperty("width", `${mediaElementBounds.width}px`);
+      this.#body.style.setProperty("height", `${mediaElementBounds.height}px`);
+      const targetBounds = this.getBoundingClientRect();
+      const top = mediaElementBounds.top - targetBounds.top;
+      const left = mediaElementBounds.left - targetBounds.left;
+      this.#body.style.setProperty("transform", `translate(${left}px, ${top}px)`);
+    }
+  }
+  set for(value) {
+    if (value !== this.for) {
+      if (value) {
+        this.setAttribute("for", value);
+      } else {
+        this.removeAttribute("for");
+      }
+      this.#for = value;
+      if (this.#for) {
+        this.mediaElement = document.querySelector(`#${this.#for}`);
+      }
+    }
+  }
+  get for() {
+    return this.#for;
+  }
+  get controlslist() {
+    return this.#controlslist;
+  }
+  static get observedAttributes() {
+    return ["for", "controlslist"];
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    if (name === "controlslist") {
+      this.controlslist.clear();
+      this.controlslist.add(newValue);
+      return;
+    }
+    if (Reflect.has(this, name)) {
+      const isBool = typeof this[name] === "boolean";
+      const value = isBool ? this.hasAttribute(name) : newValue;
+      if (value !== this[name]) {
+        this[name] = value;
+      }
     }
   }
 };

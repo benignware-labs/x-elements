@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
     <link rel="stylesheet" href="public/style-aea3468ccb7ee0c3c4c2b5d339fc989e.css">
     <link rel="stylesheet" href="public/all-cc69a8b8824029ae06797ee01a3cc5c8.css">
+    <!-- <link rel="stylesheet" href="public/400-778daa1066fcc9c181a5d4dec3c4b74e.css"> -->
 
     <!-- <style>
       @font-face {
@@ -198,16 +199,21 @@
       <pre><code class="hljs"><span class="hljs-keyword">const</span> MEDIA_TAGS = [<span class="hljs-string">&#x27;IMG&#x27;</span>, <span class="hljs-string">&#x27;VIDEO&#x27;</span>];
 
 <span class="hljs-comment">// Copy computed styles from another element</span>
-function copyStyles(dest, src) {
+function copyStyles(dest, src, props = []) {
   <span class="hljs-keyword">const</span> srcStyle = window.getComputedStyle(src);
   <span class="hljs-keyword">const</span> destStyle = window.getComputedStyle(dest);
 
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> property <span class="hljs-keyword">in</span> srcStyle) {
-    <span class="hljs-keyword">const</span> fresh = srcStyle.getPropertyValue(property)
-    <span class="hljs-keyword">const</span> current = destStyle.getPropertyValue(property)
-    
-    <span class="hljs-keyword">if</span> (fresh !== current) {
-      <span class="hljs-keyword">return</span> dest.style.setProperty(property, fresh)
+
+  <span class="hljs-keyword">for</span> (let i = <span class="hljs-number">0</span>; i &lt; srcStyle.length; i++) {
+    <span class="hljs-keyword">const</span> property = srcStyle.item(i);
+
+    <span class="hljs-keyword">if</span> (!props.length || props.includes(property)) {
+      <span class="hljs-keyword">const</span> fresh = srcStyle.getPropertyValue(property);
+      <span class="hljs-keyword">const</span> current = destStyle.getPropertyValue(property);
+
+      <span class="hljs-keyword">if</span> (fresh !== current) {
+        dest.style.setProperty(property, fresh)
+      }
     }
   }
 }
@@ -237,23 +243,21 @@ function copyStyles(dest, src) {
 };
 
 <span class="hljs-keyword">const</span> getScrollParents = (element, stop = <span class="hljs-literal">null</span>, values = [<span class="hljs-string">&#x27;scroll&#x27;</span>, <span class="hljs-string">&#x27;auto&#x27;</span>]) =&gt; {
-  let parent = element;
+  stop = Array.isArray(stop) ? stop : [stop];
+
+  let parent = element.parentNode;
 
   <span class="hljs-keyword">const</span> parents = [];
 
   <span class="hljs-keyword">while</span> (parent) {
-    <span class="hljs-keyword">if</span> (parent === document.body) {
-      <span class="hljs-keyword">return</span> parents;
-    }
-
-    <span class="hljs-keyword">if</span> (parent === stop) {
-      <span class="hljs-keyword">return</span> parents;
-    }
-
     <span class="hljs-keyword">const</span> style = window.getComputedStyle(parent);
 
     <span class="hljs-keyword">if</span> (values.includes(style.overflow) || values.includes(style.overflowX) || values.includes(style.overflowY)) {
       parents.push(parent);
+    }
+
+    <span class="hljs-keyword">if</span> (parent === document.body || stop.includes(parent)) {
+      <span class="hljs-keyword">return</span> parents;
     }
     
     parent = parent.parentElement;
@@ -269,14 +273,10 @@ function copyStyles(dest, src) {
     container = document.documentElement;
   }
 
-  container.classList.add(<span class="hljs-string">&#x27;x-ambience-scroll-measure&#x27;</span>);
-
   <span class="hljs-keyword">const</span> size = {
     width: container.scrollWidth,
     height: container.scrollHeight
   };
-
-  container.classList.remove(<span class="hljs-string">&#x27;x-ambience-scroll-measure&#x27;</span>);
 
   <span class="hljs-keyword">return</span> size;
 };
@@ -321,6 +321,7 @@ function copyStyles(dest, src) {
   #scrollParent = <span class="hljs-literal">null</span>;
 
   #backdrop;
+  #backdropBody;
 
   <span class="hljs-comment">// Props</span>
   #animated = <span class="hljs-literal">false</span>;
@@ -348,8 +349,12 @@ function copyStyles(dest, src) {
         <span class="hljs-comment">/* Add your styling here */</span>
         :host {
           display: contents;
-          --x-ambience-filter--default: contrast(<span class="hljs-number">1.3</span>) blur(<span class="hljs-number">3.</span>5rem) brightness(<span class="hljs-number">1.4</span>);
+          --x-ambience-filter--default: contrast(<span class="hljs-number">1.3</span>) blur(<span class="hljs-number">5.</span>5rem) brightness(<span class="hljs-number">1.4</span>) opacity(<span class="hljs-number">0.7</span>);
           <span class="hljs-comment">/*--x-ambience-filter--default: contrast(4) blur(3.5rem) brightness(2.7);*/</span>
+          <span class="hljs-comment">/*--x-ambience-filter--default: drop-shadow(0 0 0.75rem crimson);*/</span>
+          <span class="hljs-comment">/*--x-ambience-filter--default: none;*/</span>
+          --x-ambience-filter--default: blur(<span class="hljs-number">3.</span>5rem);
+          --x-ambience-scale--default: <span class="hljs-number">1</span>;
         }
 
         :host::part(backdrop) {
@@ -358,13 +363,13 @@ function copyStyles(dest, src) {
           pointer-events: none;
         }
 
-        :host(:state(--clip))::part(backdrop) {
-          filter: <span class="hljs-keyword">var</span>(--x-ambience-filter, blur(<span class="hljs-number">3.</span>5rem));
-          overflow: hidden;
+        :host::part(backdrop-body) {
+          position: absolute;
         }
 
-        :host-context(html.x-ambience-scroll-measure)::part(backdrop) {
-          display: none;
+        :host-context(.x-ambience-scroll-measure)::part(backdrop) {
+          display: none !important;
+          transform: none !important;
         }
 
          <span class="hljs-comment">/*:host::part(backdrop):after {
@@ -376,16 +381,8 @@ function copyStyles(dest, src) {
           bottom: 0;
           z-index: 1000;
         }*/</span>
-        
-        :host::part(backdrop-body) {
-          position: absolute;
-          transform: translate3d(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-          transform-style: preserve-<span class="hljs-number">3d</span>;
-          width: <span class="hljs-number">0</span>;
-          height: <span class="hljs-number">0</span>;
-        }
 
-        * {
+        :host(*) {
           transform-style: preserve-<span class="hljs-number">3d</span>;
           backface-visibility: hidden;
         }
@@ -393,17 +390,17 @@ function copyStyles(dest, src) {
         :host::part(clip) {
           position: absolute;
           overflow: hidden;
-          
+          <span class="hljs-comment">/* clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/</span>
         }
 
-         :host::part(clip) {
-            filter: <span class="hljs-keyword">var</span>(--x-ambience-filter, <span class="hljs-keyword">var</span>(--x-ambience-filter--default));
-         }
-
-        
-         :host::part(display) {
-         position: absolute;
+        .effect {
           filter: <span class="hljs-keyword">var</span>(--x-ambience-filter, <span class="hljs-keyword">var</span>(--x-ambience-filter--default));
+          <span class="hljs-comment">/*scale: var(--x-ambience-scale, var(--x-ambience-scale--default));
+          scale: 1;*/</span>
+        }
+
+        :host::part(display) {
+          position: absolute;
           opacity: <span class="hljs-number">0</span>;
           transition: opacity <span class="hljs-number">0.</span>125s;
           will-change: opacity;
@@ -412,22 +409,15 @@ function copyStyles(dest, src) {
         :host::part(display ready) {
           opacity: <span class="hljs-number">1</span>;
         }
-
-         :host::part(clip) :host::part(display),
-         :host::part(clip) :host::part(clip) {
-          filter: none;
-        }
-
-        :host::part(body) {
-          position: relative;
-          transform: translate3d(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-        }
       &lt;/style&gt;
-      &lt;div part=<span class="hljs-string">&quot;backdrop&quot;</span>&gt;&lt;/div&gt;
+      &lt;div part=<span class="hljs-string">&quot;backdrop&quot;</span>&gt;
+        &lt;div part=<span class="hljs-string">&quot;backdrop-body&quot;</span>&gt;&lt;/div&gt;
+      &lt;/div&gt;
       &lt;slot&gt;&lt;/slot&gt;
     `;
 
     <span class="hljs-keyword">this</span>.#backdrop = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part=&quot;backdrop&quot;]&#x27;</span>);
+    <span class="hljs-keyword">this</span>.#backdropBody = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;[part=&quot;backdrop-body&quot;]&#x27;</span>);
     <span class="hljs-keyword">this</span>.#slot = <span class="hljs-keyword">this</span>.shadowRoot.querySelector(<span class="hljs-string">&#x27;slot&#x27;</span>);
   }
 
@@ -527,6 +517,8 @@ function copyStyles(dest, src) {
 
     <span class="hljs-keyword">this</span>.#displayMediaElements.<span class="hljs-keyword">set</span>(element, mediaDisplayElement);
 
+    <span class="hljs-keyword">this</span>.updateMediaElementStyles(element);
+
     displayElement.classList.add(<span class="hljs-string">&#x27;display&#x27;</span>);
     displayElement.setAttribute(<span class="hljs-string">&#x27;part&#x27;</span>, <span class="hljs-string">&#x27;display&#x27;</span>);
 
@@ -548,16 +540,19 @@ function copyStyles(dest, src) {
 
     clippingDisplayElement.setAttribute(<span class="hljs-string">&#x27;part&#x27;</span>, <span class="hljs-string">&#x27;clip&#x27;</span>);
     clippingDisplayElement.setAttribute(<span class="hljs-string">&#x27;data-class&#x27;</span>, element.getAttribute(<span class="hljs-string">&#x27;class&#x27;</span>));
+    clippingDisplayElement.setAttribute(<span class="hljs-string">&#x27;data-tag&#x27;</span>, element.tagName);
 
     <span class="hljs-keyword">return</span> clippingDisplayElement;
   }
 
 
   mediaElementAdded(...element) {
+    <span class="hljs-keyword">const</span> targetElements = [...<span class="hljs-keyword">this</span>.#assignedChildren];
+
     element.forEach(element =&gt; {
       <span class="hljs-keyword">this</span>.#mediaElements.add(element);
 
-      <span class="hljs-keyword">const</span> scrollParents = getScrollParents(element, <span class="hljs-keyword">this</span>, [<span class="hljs-string">&#x27;scroll&#x27;</span>, <span class="hljs-string">&#x27;auto&#x27;</span>, <span class="hljs-string">&#x27;hidden&#x27;</span>]);
+      <span class="hljs-keyword">const</span> scrollParents = getScrollParents(element, targetElements, [<span class="hljs-string">&#x27;scroll&#x27;</span>, <span class="hljs-string">&#x27;auto&#x27;</span>, <span class="hljs-string">&#x27;hidden&#x27;</span>, <span class="hljs-string">&#x27;clip&#x27;</span>]);
 
       scrollParents
         .reverse()
@@ -569,7 +564,10 @@ function copyStyles(dest, src) {
 
             <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.#clippingDisplayElements.<span class="hljs-keyword">get</span>(scrollParent)) {
               <span class="hljs-keyword">const</span> clippingDisplayElement = <span class="hljs-keyword">this</span>.createClippingDisplayElement(scrollParent);
-              <span class="hljs-keyword">const</span> displayParent = <span class="hljs-keyword">this</span>.#clippingDisplayElements.<span class="hljs-keyword">get</span>(parent) || <span class="hljs-keyword">this</span>.#backdrop;
+
+              clippingDisplayElement.classList.toggle(<span class="hljs-string">&#x27;effect&#x27;</span>, !parent);
+
+              <span class="hljs-keyword">const</span> displayParent = <span class="hljs-keyword">this</span>.#clippingDisplayElements.<span class="hljs-keyword">get</span>(parent) || <span class="hljs-keyword">this</span>.#backdropBody;
   
               displayParent.appendChild(clippingDisplayElement);
   
@@ -582,8 +580,10 @@ function copyStyles(dest, src) {
         });
 
       <span class="hljs-keyword">const</span> scrollParent = scrollParents.length ? scrollParents[scrollParents.length - <span class="hljs-number">1</span>] : <span class="hljs-literal">null</span>;
-      <span class="hljs-keyword">const</span> displayParent = <span class="hljs-keyword">this</span>.#clippingDisplayElements.<span class="hljs-keyword">get</span>(scrollParent) || <span class="hljs-keyword">this</span>.#backdrop;
+      <span class="hljs-keyword">const</span> displayParent = <span class="hljs-keyword">this</span>.#clippingDisplayElements.<span class="hljs-keyword">get</span>(scrollParent) || <span class="hljs-keyword">this</span>.#backdropBody;
       <span class="hljs-keyword">const</span> displayElement = <span class="hljs-keyword">this</span>.createDisplayElement(element);
+
+      displayElement.classList.toggle(<span class="hljs-string">&#x27;effect&#x27;</span>, !scrollParent);
 
       <span class="hljs-keyword">this</span>.#displayElements.<span class="hljs-keyword">set</span>(element, displayElement);
       <span class="hljs-keyword">this</span>.#clippingParents.<span class="hljs-keyword">set</span>(element, scrollParent);
@@ -597,9 +597,7 @@ function copyStyles(dest, src) {
       element.addEventListener(<span class="hljs-string">&#x27;play&#x27;</span>, <span class="hljs-keyword">this</span>.handlePlay, { passive: <span class="hljs-literal">true</span> });
       <span class="hljs-comment">// Pause</span>
       element.addEventListener(<span class="hljs-string">&#x27;pause&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause, { passive: <span class="hljs-literal">true</span> });
-      <span class="hljs-comment">// Generic state change</span>
-      element.addEventListener(<span class="hljs-string">&#x27;pointerenter&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange, { passive: <span class="hljs-literal">true</span> });
-      element.addEventListener(<span class="hljs-string">&#x27;pointerleave&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange, { passive: <span class="hljs-literal">true</span> });
+      
 
       <span class="hljs-keyword">if</span> (element instanceof HTMLMediaElement) {
         <span class="hljs-keyword">const</span> posterImage = displayElement.querySelector(<span class="hljs-string">&#x27;img&#x27;</span>);
@@ -624,9 +622,7 @@ function copyStyles(dest, src) {
       element.removeEventListener(<span class="hljs-string">&#x27;play&#x27;</span>, <span class="hljs-keyword">this</span>.handlePlay);
       <span class="hljs-comment">// Pause</span>
       element.removeEventListener(<span class="hljs-string">&#x27;pause&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause);
-      <span class="hljs-comment">// Generic state change</span>
-      element.removeEventListener(<span class="hljs-string">&#x27;pointerenter&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange);
-      element.removeEventListener(<span class="hljs-string">&#x27;pointerleave&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange);
+     
 
       <span class="hljs-keyword">const</span> displayElement = <span class="hljs-keyword">this</span>.#displayElements.<span class="hljs-keyword">get</span>(element);
 
@@ -669,6 +665,12 @@ function copyStyles(dest, src) {
         element.addEventListener(<span class="hljs-string">&#x27;transitionstart&#x27;</span>, <span class="hljs-keyword">this</span>.handlePlay, { passive: <span class="hljs-literal">true</span> });
         element.addEventListener(<span class="hljs-string">&#x27;animationend&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause, { passive: <span class="hljs-literal">true</span> });
         element.addEventListener(<span class="hljs-string">&#x27;transitionend&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause, { passive: <span class="hljs-literal">true</span> });
+
+        <span class="hljs-comment">// Generic state change</span>
+        element.addEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange, { passive: <span class="hljs-literal">true</span> });
+        element.addEventListener(<span class="hljs-string">&#x27;pointerover&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange, { passive: <span class="hljs-literal">true</span> });
+        element.addEventListener(<span class="hljs-string">&#x27;pointerenter&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange, { passive: <span class="hljs-literal">true</span> });
+        element.addEventListener(<span class="hljs-string">&#x27;pointerleave&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange, { passive: <span class="hljs-literal">true</span> });
       
         <span class="hljs-keyword">const</span> nodes = [...element.querySelectorAll(MEDIA_TAGS.join(<span class="hljs-string">&#x27;, &#x27;</span>))];
         
@@ -698,6 +700,11 @@ function copyStyles(dest, src) {
         element.removeEventListener(<span class="hljs-string">&#x27;transitionstart&#x27;</span>, <span class="hljs-keyword">this</span>.handlePlay);
         element.removeEventListener(<span class="hljs-string">&#x27;animationend&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause);
         element.removeEventListener(<span class="hljs-string">&#x27;transitionend&#x27;</span>, <span class="hljs-keyword">this</span>.handlePause);
+
+        element.removeEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange);
+        element.removeEventListener(<span class="hljs-string">&#x27;pointerover&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange);
+        element.removeEventListener(<span class="hljs-string">&#x27;pointerenter&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange);
+        element.removeEventListener(<span class="hljs-string">&#x27;pointerleave&#x27;</span>, <span class="hljs-keyword">this</span>.handleStateChange);
 
         <span class="hljs-keyword">this</span>.#assignedChildren.delete(element);
 
@@ -743,9 +750,11 @@ function copyStyles(dest, src) {
   }
 
   handleStateChange(event) {
-    <span class="hljs-keyword">const</span> element = event.target;
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElements.has(event.target)) {
+      <span class="hljs-keyword">this</span>.updateMediaElementStyles(event.target);
+    }
 
-    <span class="hljs-keyword">this</span>.updateMediaElement(element);
+    <span class="hljs-keyword">this</span>.render();
   }
 
   startAnimation(element, id) {
@@ -833,10 +842,15 @@ function copyStyles(dest, src) {
 
   connectedCallback() {
     window.addEventListener(<span class="hljs-string">&#x27;resize&#x27;</span>, <span class="hljs-keyword">this</span>.handleResize, { passive: <span class="hljs-literal">true</span> });
+
     <span class="hljs-keyword">this</span>.#slot.addEventListener(<span class="hljs-string">&#x27;slotchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleSlotChange);
     
 
     <span class="hljs-keyword">this</span>.#scrollParent = getScrollParent(<span class="hljs-keyword">this</span>);
+
+    <span class="hljs-keyword">const</span> scrollTarget = <span class="hljs-keyword">this</span>.#scrollParent === document.body ? window : <span class="hljs-keyword">this</span>.#scrollParent;
+
+    scrollTarget.addEventListener(<span class="hljs-string">&#x27;scroll&#x27;</span>, <span class="hljs-keyword">this</span>.handleScroll, { passive: <span class="hljs-literal">true</span> });
 
     <span class="hljs-keyword">this</span>.render();
   }
@@ -845,6 +859,9 @@ function copyStyles(dest, src) {
     window.removeEventListener(<span class="hljs-string">&#x27;resize&#x27;</span>, <span class="hljs-keyword">this</span>.handleResize);
     <span class="hljs-keyword">this</span>.#slot.removeEventListener(<span class="hljs-string">&#x27;slotchange&#x27;</span>, <span class="hljs-keyword">this</span>.handleSlotChange);
 
+    <span class="hljs-keyword">const</span> scrollTarget = <span class="hljs-keyword">this</span>.#scrollParent === document.body ? window : <span class="hljs-keyword">this</span>.#scrollParent;
+    
+    scrollTarget.removeEventListener(<span class="hljs-string">&#x27;scroll&#x27;</span>, <span class="hljs-keyword">this</span>.handleScroll);
     <span class="hljs-keyword">this</span>.#scrollParent = <span class="hljs-literal">null</span>;
   }
 
@@ -853,88 +870,11 @@ function copyStyles(dest, src) {
   }
 
   targetElementsChanged() {
-    <span class="hljs-keyword">const</span> targetElements = [...<span class="hljs-keyword">this</span>.#assignedChildren];
-    
-    let isClipping = <span class="hljs-literal">true</span>;
-
-    <span class="hljs-keyword">const</span> hasOnlyMediaElements = targetElements.every(element =&gt; MEDIA_TAGS.includes(element.nodeName));
-
-    <span class="hljs-keyword">if</span> (!hasOnlyMediaElements) {
-      isClipping = <span class="hljs-literal">false</span>;
-    } <span class="hljs-keyword">else</span> {
-      <span class="hljs-keyword">const</span> clippingTargets = <span class="hljs-keyword">this</span>.getClippingTargets();
-
-      <span class="hljs-keyword">if</span> (clippingTargets.size === <span class="hljs-number">0</span>) {
-        isClipping = <span class="hljs-literal">false</span>;
-      }
-    }
-
-    <span class="hljs-comment">// if (isClipping) {</span>
-    <span class="hljs-comment">//   this.#internals.states.add(&#x27;--clip&#x27;);</span>
-    <span class="hljs-comment">// } else {</span>
-    <span class="hljs-comment">//   this.#internals.states.delete(&#x27;--clip&#x27;);</span>
-    <span class="hljs-comment">// }s</span>
     <span class="hljs-keyword">this</span>.render();
   }
 
-  getClippingTargets() {
-    <span class="hljs-keyword">const</span> clippingTargets = new Set();
-    <span class="hljs-keyword">const</span> mediaElements = [...<span class="hljs-keyword">this</span>.#mediaElements];
-
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> element of mediaElements) {
-      <span class="hljs-keyword">const</span> scrollParent = getScrollParent(element);
-
-      <span class="hljs-keyword">if</span> (scrollParent &amp;&amp; scrollParent !== <span class="hljs-keyword">this</span>.#scrollParent) {
-        clippingTargets.add(scrollParent);
-      }
-    }
-
-    <span class="hljs-keyword">return</span> clippingTargets;
-  }
-
-  <span class="hljs-keyword">get</span> isClipping() {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.#internals.states.has(<span class="hljs-string">&#x27;--clip&#x27;</span>);
-  }
-
-  <span class="hljs-keyword">get</span> clipArea() {
-    let bounds = [...<span class="hljs-keyword">this</span>.#assignedChildren].reduce((bounds, element) =&gt; {
-      <span class="hljs-keyword">const</span> elementBounds = element.getBoundingClientRect();
-
-      bounds.top = Math.min(bounds.top, elementBounds.top);
-      bounds.left = Math.min(bounds.left, elementBounds.left);
-      bounds.bottom = Math.max(bounds.bottom, elementBounds.bottom);
-      bounds.right = Math.max(bounds.right, elementBounds.right);
-      
-      <span class="hljs-keyword">return</span> bounds;
-    }, {
-      top: Infinity,
-      left: Infinity,
-      bottom: -Infinity,
-      right: -Infinity
-    });
-
-
-    bounds = {
-      top: Math.round(bounds.top),
-      left: Math.round(bounds.left),
-      width: Math.round(bounds.right - bounds.left),
-      height: Math.round(bounds.bottom - bounds.top),
-      right: Math.round(bounds.right),
-      bottom: Math.round(bounds.bottom)
-    };
-
-    <span class="hljs-keyword">const</span> targetBounds = <span class="hljs-keyword">this</span>.#backdrop.getBoundingClientRect();
-
-    bounds.top -= targetBounds.top;
-    bounds.left -= targetBounds.left;
-    bounds.bottom -= targetBounds.top;
-    bounds.right -= targetBounds.left;
-
-    <span class="hljs-keyword">return</span> bounds;
-  }
-
   getZIndex() {
-    <span class="hljs-keyword">const</span> computedStyle = window.getComputedStyle(<span class="hljs-keyword">this</span>.#backdrop);
+    <span class="hljs-keyword">const</span> computedStyle = window.getComputedStyle(<span class="hljs-keyword">this</span>.#backdropBody);
     let zIndex = computedStyle.getPropertyValue(<span class="hljs-string">&#x27;--x-ambience-z-index&#x27;</span>);
 
     <span class="hljs-keyword">if</span> (!zIndex || zIndex === <span class="hljs-string">&#x27;auto&#x27;</span>) {
@@ -951,14 +891,27 @@ function copyStyles(dest, src) {
       <span class="hljs-keyword">return</span>;
     }
 
-    <span class="hljs-keyword">const</span> parent = <span class="hljs-keyword">this</span>.#clippingParents.<span class="hljs-keyword">get</span>(element) || <span class="hljs-keyword">this</span>.#backdrop;
+    <span class="hljs-keyword">const</span> clippingParent = <span class="hljs-keyword">this</span>.#clippingParents.<span class="hljs-keyword">get</span>(element);
+    <span class="hljs-keyword">const</span> parent = clippingParent || <span class="hljs-keyword">this</span>.#backdropBody;
 
     <span class="hljs-keyword">const</span> clippingArea = element.getBoundingClientRect();
     <span class="hljs-keyword">const</span> targetBounds = parent.getBoundingClientRect();
 
-    clippingDisplayElement.style.setProperty(<span class="hljs-string">&#x27;transform&#x27;</span>, `translate3d(${clippingArea.left - targetBounds.left}px, ${clippingArea.top - targetBounds.top}px, <span class="hljs-number">0</span>)`);
-    clippingDisplayElement.style.setProperty(<span class="hljs-string">&#x27;width&#x27;</span>, `${clippingArea.width}px`);
-    clippingDisplayElement.style.setProperty(<span class="hljs-string">&#x27;height&#x27;</span>, `${clippingArea.height}px`);
+    <span class="hljs-comment">// const scale = !clippingParent ? &#x27;var(--x-ambience-scale, var(--x-ambience-scale--default))&#x27; : &#x27;1&#x27;;</span>
+    <span class="hljs-keyword">const</span> style = clippingDisplayElement.style;
+
+    <span class="hljs-keyword">const</span> left = clippingArea.left - targetBounds.left;
+    <span class="hljs-keyword">const</span> top = clippingArea.top - targetBounds.top;
+
+    <span class="hljs-comment">// style.setProperty(&#x27;transform&#x27;, `translate3d(${clippingArea.left - targetBounds.left}px, ${clippingArea.top - targetBounds.top}px, 0) scale(${scale})`);</span>
+
+    <span class="hljs-comment">// const scale = !clippingParent ? &#x27; scale(var(--x-ambience-scale, var(--x-ambience-scale--default))) &#x27; : &#x27;&#x27;;</span>
+    <span class="hljs-keyword">const</span> scale = <span class="hljs-string">&#x27;&#x27;</span>;
+
+    style.setProperty(<span class="hljs-string">&#x27;transform&#x27;</span>, `${scale}  translate3d(${left}px, ${top}px, <span class="hljs-number">0</span>) `);
+
+    style.setProperty(<span class="hljs-string">&#x27;width&#x27;</span>, `${clippingArea.width}px`);
+    style.setProperty(<span class="hljs-string">&#x27;height&#x27;</span>, `${clippingArea.height}px`);
   }
 
   updateClippingDisplayElements () {
@@ -986,6 +939,30 @@ function copyStyles(dest, src) {
     <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
   }
 
+  updateMediaElementStyles(element) {
+    <span class="hljs-keyword">const</span> mediaDisplayElement = <span class="hljs-keyword">this</span>.#displayMediaElements.<span class="hljs-keyword">get</span>(element);
+
+    <span class="hljs-keyword">if</span> (!mediaDisplayElement) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    copyStyles(mediaDisplayElement, element, [
+      <span class="hljs-string">&#x27;object-fit&#x27;</span>,
+      <span class="hljs-string">&#x27;object-position&#x27;</span>,
+      <span class="hljs-string">&#x27;filter&#x27;</span>,
+      <span class="hljs-string">&#x27;transform&#x27;</span>,
+      <span class="hljs-string">&#x27;transform-origin&#x27;</span>,
+      <span class="hljs-string">&#x27;transform-style&#x27;</span>,
+      <span class="hljs-string">&#x27;opacity&#x27;</span>,
+      <span class="hljs-string">&#x27;position&#x27;</span>,
+      <span class="hljs-comment">// &#x27;top&#x27;,</span>
+      <span class="hljs-comment">// &#x27;left&#x27;,</span>
+      <span class="hljs-comment">// &#x27;right&#x27;,</span>
+      <span class="hljs-comment">// &#x27;bottom&#x27;,</span>
+      <span class="hljs-string">&#x27;clip-path&#x27;</span>,
+    ]);
+  }
+
   updateMediaElement(element) {
     <span class="hljs-keyword">const</span> displayElement = <span class="hljs-keyword">this</span>.#displayElements.<span class="hljs-keyword">get</span>(element);
 
@@ -993,7 +970,8 @@ function copyStyles(dest, src) {
       <span class="hljs-keyword">return</span>;
     }
 
-    <span class="hljs-keyword">const</span> targetParent = <span class="hljs-keyword">this</span>.#clippingParents.<span class="hljs-keyword">get</span>(element) || <span class="hljs-keyword">this</span>.#backdrop;
+    <span class="hljs-keyword">const</span> clippingParent = <span class="hljs-keyword">this</span>.#clippingParents.<span class="hljs-keyword">get</span>(element);
+    <span class="hljs-keyword">const</span> targetParent = clippingParent || <span class="hljs-keyword">this</span>.#backdropBody;
     <span class="hljs-keyword">const</span> targetBounds = targetParent.getBoundingClientRect();
 
     <span class="hljs-keyword">const</span> elementBounds = element.getBoundingClientRect();
@@ -1001,13 +979,40 @@ function copyStyles(dest, src) {
     <span class="hljs-keyword">const</span> top = elementBounds.top - targetBounds.top;
     <span class="hljs-keyword">const</span> left = elementBounds.left - targetBounds.left;
 
-    displayElement.style.setProperty(<span class="hljs-string">&#x27;transform&#x27;</span>, `translate3d(${left}px, ${top}px, <span class="hljs-number">0</span>)`);
+    <span class="hljs-comment">// const scale = !clippingParent ? &#x27; translate(-50%, -50%) scale(var(--x-ambience-scale, var(--x-ambience-scale--default)))&#x27; : &#x27;&#x27;;</span>
+    <span class="hljs-keyword">const</span> scale = <span class="hljs-string">&#x27;  scale(var(--x-ambience-scale, var(--x-ambience-scale--default)))&#x27;</span>;
+
+    <span class="hljs-keyword">const</span> isRenderedBefore = displayElement.style.transform !== <span class="hljs-string">&#x27;&#x27;</span>;
+
+      <span class="hljs-keyword">if</span> (!isRenderedBefore || elementBounds.width &gt; <span class="hljs-number">0</span> &amp;&amp; elementBounds.height &gt; <span class="hljs-number">0</span>) {
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;transform&#x27;</span>, `translate3d(${left}px, ${top}px, <span class="hljs-number">0</span>) ${scale} `);
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;width&#x27;</span>, `${elementBounds.width}px`);
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;height&#x27;</span>, `${elementBounds.height}px`);
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;opacity&#x27;</span>, <span class="hljs-number">1</span>);
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;display&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>);
+
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (isRenderedBefore) {
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;opacity&#x27;</span>, <span class="hljs-number">0</span>);
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;display&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>);
+      } <span class="hljs-keyword">else</span> {
+        displayElement.style.setProperty(<span class="hljs-string">&#x27;display&#x27;</span>, <span class="hljs-string">&#x27;none&#x27;</span>);
+      }
+
+    displayElement.style.setProperty(<span class="hljs-string">&#x27;width&#x27;</span>, `${elementBounds.width}px`);
+    displayElement.style.setProperty(<span class="hljs-string">&#x27;height&#x27;</span>, `${elementBounds.height}px`);
+
     displayElement.setAttribute(<span class="hljs-string">&#x27;part&#x27;</span>, <span class="hljs-keyword">this</span>.isElementReady(element) ? <span class="hljs-string">&#x27;display ready&#x27;</span> : <span class="hljs-string">&#x27;display&#x27;</span>);
 
     <span class="hljs-keyword">const</span> mediaDisplayElement = <span class="hljs-keyword">this</span>.#displayMediaElements.<span class="hljs-keyword">get</span>(element);
 
-    copyStyles(mediaDisplayElement, element);
+    <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Copy styles in a separate state handler</span>
+    <span class="hljs-comment">// copyStyles(mediaDisplayElement, element);</span>
+    mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;visibility&#x27;</span>, window.getComputedStyle(element).visibility);
 
+    mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;position&#x27;</span>, <span class="hljs-string">&#x27;absolute&#x27;</span>);
+    mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;top&#x27;</span>, <span class="hljs-string">&#x27;0&#x27;</span>);
+    mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;bottom&#x27;</span>, <span class="hljs-string">&#x27;0&#x27;</span>);
+    mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;transition-duration&#x27;</span>, <span class="hljs-string">&#x27;0s&#x27;</span>);
     mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;width&#x27;</span>, `${elementBounds.width}px`);
     mediaDisplayElement.style.setProperty(<span class="hljs-string">&#x27;height&#x27;</span>, `${elementBounds.height}px`);
 
@@ -1019,6 +1024,7 @@ function copyStyles(dest, src) {
 
       poster.style.setProperty(<span class="hljs-string">&#x27;width&#x27;</span>, `${elementBounds.width}px`);
       poster.style.setProperty(<span class="hljs-string">&#x27;height&#x27;</span>, `${elementBounds.height}px`);
+      poster.style.setProperty(<span class="hljs-string">&#x27;object-fit&#x27;</span>, <span class="hljs-string">&#x27;cover&#x27;</span>);
       poster.style.setProperty(<span class="hljs-string">&#x27;display&#x27;</span>, isPoster ? <span class="hljs-string">&#x27;block&#x27;</span> : <span class="hljs-string">&#x27;none&#x27;</span>);
 
       <span class="hljs-keyword">if</span> (!isPoster) {
@@ -1037,6 +1043,43 @@ function copyStyles(dest, src) {
     }
   }
 
+  clipToParent() {
+    <span class="hljs-keyword">const</span> scrollParent = <span class="hljs-keyword">this</span>.#scrollParent;
+    <span class="hljs-keyword">const</span> backdrop = <span class="hljs-keyword">this</span>.#backdrop;
+    <span class="hljs-keyword">const</span> backdropBody = <span class="hljs-keyword">this</span>.#backdropBody;
+
+    backdrop.style.transform = ``;
+    backdrop.style.width = ``;
+    backdrop.style.height = ``;
+
+    <span class="hljs-keyword">const</span> targetBounds = backdrop.getBoundingClientRect();
+
+    scrollParent.classList.add(<span class="hljs-string">&#x27;x-ambience-scroll-measure&#x27;</span>);
+
+    <span class="hljs-keyword">const</span> scrollBounds = scrollParent.getBoundingClientRect();
+
+    <span class="hljs-keyword">const</span> relScrollBounds = {
+      top: scrollBounds.top - targetBounds.top,
+      left: scrollBounds.left - targetBounds.left,
+      right: scrollBounds.right - targetBounds.left,
+      bottom: scrollBounds.bottom - targetBounds.top
+    };
+  
+    let { left, top } = relScrollBounds;
+    let { width, height } = getScrollSize(scrollParent);
+
+    backdrop.style.transform = `translate3d(${left}px, ${top}px, <span class="hljs-number">0</span>)`;
+    backdrop.style.width = `${width}px`;
+    backdrop.style.height = `${height}px`;
+    backdrop.style.overflow = <span class="hljs-string">&#x27;hidden&#x27;</span>;
+
+    backdrop.style.transform = `translate3d(${left}px, ${top}px, <span class="hljs-number">0</span>)`;
+
+    backdropBody.style.transform = `translate3d(${-left}px, ${-top}px, <span class="hljs-number">0</span>)`;
+
+    scrollParent.classList.remove(<span class="hljs-string">&#x27;x-ambience-scroll-measure&#x27;</span>);
+  }
+
   render() {
     <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.isConnected || !<span class="hljs-keyword">this</span>.parentNode) {
       <span class="hljs-keyword">return</span>;
@@ -1049,6 +1092,9 @@ function copyStyles(dest, src) {
     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.#mediaElements.size === <span class="hljs-number">0</span>) {
       <span class="hljs-keyword">return</span>;
     }
+
+    <span class="hljs-comment">// this.clipToParent();</span>
+
 
     <span class="hljs-keyword">const</span> zIndex = <span class="hljs-keyword">this</span>.getZIndex();
 

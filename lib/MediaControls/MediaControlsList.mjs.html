@@ -1,7 +1,7 @@
 <html>
   <head>
-    <base href="."/>
-    <title>x-elements - index.mjs</title>
+    <base href="../.."/>
+    <title>x-elements - MediaControlsList.mjs</title>
 
     <link rel="stylesheet" href="public/github-markdown.min-05fea8df8ec68cb6c27337f6db65733e.css">
     <link rel="stylesheet" href="public/highlight-c281e701b2830b095c67417cd9a7b210.css">
@@ -191,18 +191,70 @@
 </div>
   <div class="flex-grow">
     <div class="container py-4">
-      <h1>Source: index.mjs</h1>
+      <h1>Source: MediaControlsList.mjs</h1>
       <p>
-        index.mjs
+        lib/MediaControls/MediaControlsList.mjs
       </p>
       
-      <pre><code class="hljs"><span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Preloader } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Preloader/Preloader.mjs&#x27;</span>;
-<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Select } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Select/Select.mjs&#x27;</span>;
-<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Option } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Select/Option.mjs&#x27;</span>;
-<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Panel } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Panel/Panel.mjs&#x27;</span>;
-<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> PanelManager } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Panel/PanelManager.mjs&#x27;</span>;
-<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> Ambience } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/Ambience/Ambience.mjs&#x27;</span>;
-<span class="hljs-keyword">export</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> MediaControls } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./lib/MediaControls/MediaControls.mjs&#x27;</span>;
+      <pre><code class="hljs"><span class="hljs-keyword">const</span> isEqualSets = (set1, set2) =&gt; {
+  <span class="hljs-keyword">if</span> (set1.size !== set2.size) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> item of set1) {
+    <span class="hljs-keyword">if</span> (!set2.has(item)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}
+
+<span class="hljs-keyword">const</span> cloneSet = (<span class="hljs-keyword">set</span>) =&gt; new Set([...<span class="hljs-keyword">set</span>]); 
+
+export <span class="hljs-keyword">class</span> <span class="hljs-title class_">MediaControlsList</span> <span class="hljs-title">extends</span> <span class="hljs-title">Set</span> {
+  #callback;
+
+  <span class="hljs-keyword">constructor</span>(callback = () =&gt; {}) {
+    <span class="hljs-keyword">super</span>();
+
+    <span class="hljs-keyword">this</span>.#callback = callback;
+  }
+
+  add(value) {
+    <span class="hljs-keyword">const</span> before = cloneSet(<span class="hljs-keyword">this</span>);
+
+    value?.split(/\s+/).forEach(value =&gt; <span class="hljs-keyword">super</span>.add(value));
+
+    <span class="hljs-keyword">if</span> (!isEqualSets(before, <span class="hljs-keyword">this</span>)) {
+      <span class="hljs-keyword">this</span>.#callback();
+    }
+  }
+
+  delete(value) {
+    <span class="hljs-keyword">const</span> before = cloneSet(<span class="hljs-keyword">this</span>);
+
+    value?.split(/\s+/).forEach(value =&gt; <span class="hljs-keyword">super</span>.delete(value));
+
+    <span class="hljs-keyword">if</span> (!isEqualSets(before, <span class="hljs-keyword">this</span>)) {
+      <span class="hljs-keyword">this</span>.#callback();
+    }
+  }
+
+  clear() {
+    <span class="hljs-keyword">const</span> before = cloneSet(<span class="hljs-keyword">this</span>);
+
+    <span class="hljs-keyword">super</span>.clear();
+
+    <span class="hljs-keyword">if</span> (!isEqualSets(before, <span class="hljs-keyword">this</span>)) {
+      <span class="hljs-keyword">this</span>.#callback();
+    }
+  }
+
+  toString() {
+    <span class="hljs-keyword">return</span> Array.from(<span class="hljs-keyword">this</span>).join(<span class="hljs-string">&#x27; &#x27;</span>);
+  }
+}
 </code></pre>
     </div>
   </div>
