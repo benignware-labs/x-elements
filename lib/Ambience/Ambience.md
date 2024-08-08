@@ -116,7 +116,6 @@ Creates atmospheric backdrop for images and videos.
   height: 300px;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
-
 ```
 
 
